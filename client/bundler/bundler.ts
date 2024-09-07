@@ -5,7 +5,7 @@
       outdir: './dist',
       minify: true,
       sourcemap: "external",
-      target: "node",
+      target: "browser",
     });
   }
 
