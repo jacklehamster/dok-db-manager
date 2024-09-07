@@ -1,39 +1,11 @@
-import express from "express";
-import { addRoutes } from "dok-db-manager";
-import dotenv from 'dotenv';
+import { Hello } from "bun-template";
+import Bao from "baojs";
+import serveStatic from "serve-static-bun";
 
-const app = express();
-dotenv.config();
+const app = new Bao();
+console.log(Hello.hello());
 
-app.use(function (req, res, next) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  res.setHeader('Access-Control-Allow-Credentials', "true");
-  next();
-});
+app.get("/*any", serveStatic("/", { middlewareMode: "bao" }));
 
-const port = parseInt(process.env.PORT ?? "3000");
-
-app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/index.html");
-});
-
-app.use(express.static(__dirname));
-
-const SECRET_WORD = process.env.SECRET_WORD ?? "secret";
-
-addRoutes(app, {
-  github: {
-    owner: "jacklehamster",
-    repo: "power-troll-levels",
-  },
-  secret: {
-    secret: SECRET_WORD,
-  },
-  nocache: true,
-});
-
-
-app.listen({ port });
-console.log(`Listening on http://localhost:${port}`);
+const server = app.listen({ port: 3000 });
+console.log(`Listening on http://localhost:${server.port}`);
