@@ -1,28 +1,15 @@
-# bun-template
+# dok-db-manager
 
-[![npm version](https://badge.fury.io/js/bun-template.svg)](https://www.npmjs.com/package/bun-template)
+[![npm version](https://badge.fury.io/js/dok-db-manager.svg)](https://www.npmjs.com/package/dok-db-manager)
 
-Bun template for creating projects using bunjs
+Manager for DB
 
-![icon](https://jacklehamster.github.io/bun-template/icon.png)
-
-## Install bun
-
-<https://bun.sh/>
-
-```bash
-curl -fsSL https://bun.sh/install | bash
-```
-
-## Commands
-
-- **start**: "bun run index.ts",
-- **bundle**: "bun run bundler/bundler.ts",
+![icon](https://jacklehamster.github.io/dok-db-manager/icon.png)
 
 ## Run example
 
-[https://jacklehamster.github.io/bun-template/example/](https://jacklehamster.github.io/bun-template/example/)
+[https://jacklehamster.github.io/dok-db-manager/example/](https://jacklehamster.github.io/dok-db-manager/example/)
 
 ## Github Source
 
-[https://github.com/jacklehamster/bun-template/](https://github.com/jacklehamster/bun-template/)
+[https://github.com/jacklehamster/dok-db-manager/](https://github.com/jacklehamster/dok-db-manager/)
