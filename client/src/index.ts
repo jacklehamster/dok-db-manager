@@ -5,6 +5,7 @@ interface Props {
   user: string;
   type: string;
   session: string;
+  secret?: string;
 }
 
 export class DokDb implements DbApi {
@@ -12,13 +13,15 @@ export class DokDb implements DbApi {
   user: string;
   token?: string;
   session?: string;
+  secret?: string;
   type: string;
 
-  constructor({ rootUrl, user, type, session }: Props) {
+  constructor({ rootUrl, user, type, session, secret }: Props) {
     this.rootUrl = rootUrl;
     this.user = user;
     this.type = type;
     this.session = session;
+    this.secret = secret;
   }
 
   async listKeys(subfolder?: string, branch?: string, recursive?: boolean): Promise<any> {
@@ -59,8 +62,11 @@ export class DokDb implements DbApi {
     if (this.session) {
       params.set("session", this.session);
     }
+    if (this.secret) {
+      params.set("secret", this.secret);
+    }
 
-    const response = await fetch(`${this.rootUrl}/data/${key}`, {
+    const response = await fetch(`${this.rootUrl}/data/${key}?${params}`, {
       method: "PUT",
       body: JSON.stringify(value),
       headers: {

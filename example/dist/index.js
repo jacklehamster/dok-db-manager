@@ -23535,12 +23535,14 @@ class DokDb {
   user;
   token;
   session;
+  secret;
   type;
-  constructor({ rootUrl, user, type, session }) {
+  constructor({ rootUrl, user, type, session, secret }) {
     this.rootUrl = rootUrl;
     this.user = user;
     this.type = type;
     this.session = session;
+    this.secret = secret;
   }
   async listKeys(subfolder, branch, recursive) {
     const params = new URLSearchParams;
@@ -23577,7 +23579,10 @@ class DokDb {
     if (this.session) {
       params.set("session", this.session);
     }
-    const response = await fetch(`${this.rootUrl}/data/${key}`, {
+    if (this.secret) {
+      params.set("secret", this.secret);
+    }
+    const response = await fetch(`${this.rootUrl}/data/${key}?${params}`, {
       method: "PUT",
       body: JSON.stringify(value),
       headers: {
@@ -23596,7 +23601,8 @@ var dokDb = new DokDb({
   rootUrl: "http://localhost:3000",
   user: "jacklehamster",
   type: "newgrounds",
-  session: "example"
+  session: "example",
+  secret: await fetch("/secret").then((r) => r.text())
 });
 var HelloComponent = () => {
   const [keys, setKeys] = import_react.default.useState([]);
@@ -23607,6 +23613,30 @@ var HelloComponent = () => {
   }, []);
   const [loading, setLoading] = import_react.default.useState(false);
   const [data, setData] = import_react.default.useState();
+  const [textAreaData, setTextAreaData] = import_react.default.useState("");
+  import_react.useEffect(() => {
+    try {
+      const data2 = JSON.parse(textAreaData);
+      setData({ type: "object", data: data2 });
+    } catch (e) {
+      setTextAreaData("");
+    }
+  }, [textAreaData]);
+  const [keyViewed, setKeyViewed] = import_react.default.useState("");
+  const loadKey = import_react.useCallback(async (key) => {
+    setKeyViewed(key);
+    setLoading(true);
+    const data2 = await dokDb.getData(key);
+    setData(data2);
+    setTextAreaData(JSON.stringify(data2.data, null, 2));
+    setLoading(false);
+  }, []);
+  const saveData = import_react.useCallback(async () => {
+    if (data?.type === "object") {
+      await dokDb.setData(keyViewed, data.data);
+      loadKey(keyViewed);
+    }
+  }, [keyViewed, textAreaData]);
   return jsx_dev_runtime.jsxDEV(jsx_dev_runtime.Fragment, {
     children: [
       jsx_dev_runtime.jsxDEV("button", {
@@ -23625,12 +23655,7 @@ var HelloComponent = () => {
           } else {
             return jsx_dev_runtime.jsxDEV("button", {
               type: "button",
-              onClick: async () => {
-                setLoading(true);
-                const data2 = await dokDb.getData(key);
-                setData(data2);
-                setLoading(false);
-              },
+              onClick: async () => loadKey(key),
               children: [
                 key,
                 " (",
@@ -23642,10 +23667,28 @@ var HelloComponent = () => {
         })
       }, undefined, false, undefined, this),
       jsx_dev_runtime.jsxDEV("hr", {}, undefined, false, undefined, this),
-      data?.type === "object" && jsx_dev_runtime.jsxDEV("div", {
-        children: JSON.stringify(data.data)
+      jsx_dev_runtime.jsxDEV(jsx_dev_runtime.Fragment, {
+        children: keyViewed
       }, undefined, false, undefined, this),
       jsx_dev_runtime.jsxDEV("hr", {}, undefined, false, undefined, this),
+      !loading && data?.type === "object" && jsx_dev_runtime.jsxDEV(jsx_dev_runtime.Fragment, {
+        children: [
+          jsx_dev_runtime.jsxDEV("textarea", {
+            cols: 100,
+            rows: 20,
+            title: "Data",
+            value: textAreaData,
+            onChange: (e) => setTextAreaData(e.target.value)
+          }, undefined, false, undefined, this),
+          jsx_dev_runtime.jsxDEV("br", {}, undefined, false, undefined, this),
+          jsx_dev_runtime.jsxDEV("button", {
+            type: "button",
+            onClick: () => saveData(),
+            title: "Click me",
+            children: "Save"
+          }, undefined, false, undefined, this)
+        ]
+      }, undefined, true, undefined, this),
       !loading && data?.type === "blob" && jsx_dev_runtime.jsxDEV("img", {
         title: data.url,
         src: data.url

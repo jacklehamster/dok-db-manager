@@ -31,16 +31,23 @@ export interface Config {
 export function addRoutes(app: express.Express, config: Config) {
   app.use(express.json());
 
-  const redisClient = createRedisClient(config.redisConfig);
+  const redisClient = config.redisConfig ? createRedisClient(config.redisConfig) : null;
   const githubDb = getGithubDb({
-    lock: config.nolock ? undefined : new RedisLock(redisClient),
+    lock: config.nolock || !redisClient ? undefined : new RedisLock(redisClient),
     owner: config.github.owner,
     repo: config.github.repo,
   })
   const githubApi = config.nocache ? githubDb : new CacheWrap(redisClient, githubDb);
 
+  const authData: Record<string, any> = {};
+
   const auth = new AuthManager(
-    new AuthProvider(redisClient),
+    new AuthProvider(redisClient ?? {
+      get: async (key) => (authData[key], null),
+      set: async (key, value) => authData[key] = value,
+      del: async (key) => (delete authData[key], 0),
+      quit: async () => "",
+    }),
     [
       config.newgrounds ? new NewgroundsAuthenticator({
         game: config.newgrounds?.game,

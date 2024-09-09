@@ -32,8 +32,12 @@ addRoutes(app, {
     secret: SECRET_WORD,
   },
   nocache: true,
+  nolock: true,
 });
 
+app.get("/secret", (req, res) => {
+  res.send(SECRET_WORD);
+});
 
 app.listen({ port });
 console.log(`Listening on http://localhost:${port}`);

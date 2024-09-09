@@ -2,7 +2,7 @@
 /// <reference lib="dom" />
 /// <reference lib="dom.iterable" />
 
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { DokDb } from "dok-db-manager-client";
@@ -14,6 +14,7 @@ const dokDb = new DokDb({
   user: "jacklehamster",
   type: "newgrounds",
   session: "example",
+  secret: await fetch("/secret").then(r => r.text()),
 });
 
 export interface Key {
@@ -30,6 +31,37 @@ const HelloComponent = () => {
   }, []);
   const [loading, setLoading] = React.useState(false);
   const [data, setData] = React.useState<{type?: string|null; url?: string; data: any}|undefined>();
+  const [textAreaData, setTextAreaData] = React.useState("");
+  
+  useEffect(() => {
+    try {
+      const data = JSON.parse(textAreaData);
+      setData({type: "object", data});
+    } catch (e) {
+      setTextAreaData("");
+    }
+  }, [textAreaData]);
+
+  const [keyViewed, setKeyViewed] = React.useState("");
+
+  const loadKey = useCallback(async (key: string) => {
+    setKeyViewed(key);
+    setLoading(true);
+    const data = await dokDb.getData(key);
+    setData(data);
+    setTextAreaData(JSON.stringify(data.data, null, 2));
+    setLoading(false);
+  }, []);
+
+  const saveData = useCallback(async () => {
+    if (data?.type === "object") {
+      await dokDb.setData(keyViewed, data.data);
+      loadKey(keyViewed);
+    }
+  }, [keyViewed, textAreaData]);
+
+  
+
 
   return <>
     <button type="button" onClick={() => {
@@ -39,18 +71,22 @@ const HelloComponent = () => {
       if (type === "tree") {
         return <div key={key}>{key}</div>;        
       } else {
-        return <button key={key} type="button" onClick={async () => {
-          setLoading(true);
-          const data = await dokDb.getData(key);
-          setData(data);
-          setLoading(false);
-        }
-      }>{key} ({type})</button>;
+        return <button key={key} type="button" onClick={async () => loadKey(key)}>
+          {key} ({type})
+        </button>;
     }})}
     </>
     <hr></hr>
-    {data?.type === "object" && <div>{JSON.stringify(data.data)}</div>}
+    <>{keyViewed}</>
     <hr></hr>
+    {!loading && data?.type === "object" && <>
+      <textarea cols={100} rows={20} title="Data" value={textAreaData}
+        onChange={e => setTextAreaData(e.target.value)}></textarea>
+      <br></br>
+      <button type="button" onClick={() => saveData()} title="Click me">
+        Save
+      </button>
+    </>}
     {!loading && data?.type === "blob" && <img title={data.url} src={data.url} />}
     {loading && <div>Loading...</div>}
   </>;

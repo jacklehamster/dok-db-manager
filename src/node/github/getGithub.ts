@@ -9,12 +9,13 @@ interface Props {
 }
 
 export function getGithubDb(props: Props): DbApi {
-  return {
-    ...lockWrap(new GithubApi({
-      username: props.owner,
-      organizationName: props.owner,
-      databaseStorageRepoName: props.repo,
-      authToken: process.env.GITHUBDB_TOKEN ?? "",
-    }), props.lock),
-  };
+  const githubApi = new GithubApi({
+    username: props.owner,
+    organizationName: props.owner,
+    databaseStorageRepoName: props.repo,
+    authToken: process.env.GITHUBDB_TOKEN ?? "",
+  });
+  return props.lock ? {
+    ...lockWrap(githubApi, props.lock),
+  } : githubApi;
 }

@@ -7,11 +7,11 @@ interface DataQuery {
   user?: string;
   token?: string;
   session?: string;
+  secret?: string;
   branch?: string;
 }
 
 interface BodyQuery {
-  secret?: string;
 }
 
 interface Props {
@@ -37,7 +37,7 @@ export function addPutDataRoute(app: express.Express, { githubApi, auth }: Props
       userId: query.user,
       authToken: query.token,
       session: query.session,
-      secret: body.secret,
+      secret: query.secret,
     });
     if (!authResult.authToken) {
       return res.json({ success: false, message: "Unauthorized" });
