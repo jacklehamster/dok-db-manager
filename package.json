@@ -2,7 +2,7 @@
   "name": "dok-db-manager",
   "module": "src/index.tsx",
   "description": "Managing data client with a nice UI",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "keywords": [
     "bun",
     "bunjs",
