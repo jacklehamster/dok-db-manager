@@ -3,6 +3,7 @@
   "module": "index.ts",
   "type": "module",
   "devDependencies": {
+    "@dobuki/auto-publish": "^1.0.20",
     "@types/bun": "latest"
   },
   "peerDependencies": {
@@ -12,8 +13,6 @@
     "test": "bun test",
     "build": "bun i && rm -rf *.tsbuildinfo && rm -rf dist/*.* && bun run bundler/bundler.ts && bun run test && bun run build:declaration",
     "build:declaration": "tsc --emitDeclarationOnly --project tsconfig.types.json",
-    "build:example": "cd example && bun i && bun run build && cd ..",
-    "example": "cd example && bun start && cd ..",
     "auto-publish": "npm explore @dobuki/auto-publish -- bun run auto-publish \"$(pwd)\""
   }
 }
