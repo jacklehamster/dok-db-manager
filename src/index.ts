@@ -1,1 +1,1 @@
-export { addRoutes, Config } from "./node";
+export { addRoutes, Config } from "./node/routes/routes";

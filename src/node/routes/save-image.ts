@@ -50,10 +50,9 @@ export function addSaveImageRoute(app: express.Express, { githubApi, auth, owner
       if (!req.file) {
         return res.status(400).send('No file uploaded.');
       }
-      const filename = req.body.filename;
       // Get the image buffer from the file
-      const { buffer, mimetype } = req.file;
-
+      const { buffer, mimetype, originalname } = req.file;
+      const filename = originalname.replace(/\.[^/.]+$/, '');
       // Convert the buffer to a Blob-like structure
       const saveResult = await githubApi.setData(
         `image/${filename}.${mime.extension(mimetype)}`,

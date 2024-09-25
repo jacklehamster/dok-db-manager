@@ -1,6 +1,6 @@
 {
   "name": "dok-db-manager",
-  "module": "src/index.tsx",
+  "module": "src/index.ts",
   "description": "Managing data client with a nice UI",
   "version": "1.0.2",
   "keywords": [

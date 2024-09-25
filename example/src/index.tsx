@@ -5,7 +5,7 @@
 import React, { useCallback, useEffect } from "react";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { DokDb } from "dok-db-manager-client";
+import { DokDb, Uploader } from "dok-db-manager-client";
 
 const div = document.body.appendChild(document.createElement("div"));
 
@@ -89,6 +89,7 @@ const HelloComponent = () => {
     </>}
     {!loading && data?.type === "blob" && <img title={data.url} src={data.url} />}
     {loading && <div>Loading...</div>}
+    <Uploader />
   </>;
 };
 

@@ -78,3 +78,5 @@ export class DokDb implements DbApi {
     return result;
   }
 }
+
+export * from "./uploader";

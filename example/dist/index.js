@@ -23525,11 +23525,64 @@ var require_jsx_dev_runtime = __commonJS((exports, module) => {
 });
 
 // src/index.tsx
-var import_react = __toESM(require_react(), 1);
 var import_react2 = __toESM(require_react(), 1);
-var client = __toESM(require_client(), 1);
+var import_react3 = __toESM(require_react(), 1);
+var client2 = __toESM(require_client(), 1);
 
-// ../client/src/index.ts
+// ../client/src/uploader.tsx
+var import_react = __toESM(require_react(), 1);
+var client = __toESM(require_client(), 1);
+var jsx_dev_runtime = __toESM(require_jsx_dev_runtime(), 1);
+function Uploader() {
+  const [secret, setSecret] = import_react.default.useState("");
+  import_react.useEffect(() => {
+    setSecret(window.localStorage.getItem("secret") || "");
+  }, []);
+  import_react.useEffect(() => {
+    window.localStorage.setItem("secret", secret);
+  }, [secret]);
+  return jsx_dev_runtime.jsxDEV(jsx_dev_runtime.Fragment, {
+    children: jsx_dev_runtime.jsxDEV("form", {
+      action: "/save-image",
+      method: "post",
+      encType: "multipart/form-data",
+      children: [
+        jsx_dev_runtime.jsxDEV("div", {
+          children: [
+            jsx_dev_runtime.jsxDEV("label", {
+              htmlFor: "secret",
+              children: "Secret"
+            }, undefined, false, undefined, this),
+            jsx_dev_runtime.jsxDEV("input", {
+              name: "secret",
+              id: "secret",
+              type: "password",
+              value: secret,
+              onChange: (e) => setSecret(e.target.value)
+            }, undefined, false, undefined, this)
+          ]
+        }, undefined, true, undefined, this),
+        jsx_dev_runtime.jsxDEV("label", {
+          htmlFor: "img",
+          children: "Image upload"
+        }, undefined, false, undefined, this),
+        jsx_dev_runtime.jsxDEV("input", {
+          id: "img",
+          type: "file",
+          name: "image",
+          accept: "image/*",
+          required: true
+        }, undefined, false, undefined, this),
+        jsx_dev_runtime.jsxDEV("button", {
+          type: "submit",
+          children: "Upload Image"
+        }, undefined, false, undefined, this)
+      ]
+    }, undefined, true, undefined, this)
+  }, undefined, false, undefined, this);
+}
+
+// ../client/src/index.tsx
 class DokDb {
   rootUrl;
   user;
@@ -23595,7 +23648,7 @@ class DokDb {
   }
 }
 // src/index.tsx
-var jsx_dev_runtime = __toESM(require_jsx_dev_runtime(), 1);
+var jsx_dev_runtime2 = __toESM(require_jsx_dev_runtime(), 1);
 var div = document.body.appendChild(document.createElement("div"));
 var dokDb = new DokDb({
   rootUrl: "http://localhost:3000",
@@ -23605,16 +23658,16 @@ var dokDb = new DokDb({
   secret: await fetch("/secret").then((r) => r.text())
 });
 var HelloComponent = () => {
-  const [keys, setKeys] = import_react.default.useState([]);
-  const list = import_react.useCallback(async () => {
+  const [keys, setKeys] = import_react2.default.useState([]);
+  const list = import_react2.useCallback(async () => {
     const data2 = await dokDb.listKeys();
     console.log(data2);
     setKeys(data2);
   }, []);
-  const [loading, setLoading] = import_react.default.useState(false);
-  const [data, setData] = import_react.default.useState();
-  const [textAreaData, setTextAreaData] = import_react.default.useState("");
-  import_react.useEffect(() => {
+  const [loading, setLoading] = import_react2.default.useState(false);
+  const [data, setData] = import_react2.default.useState();
+  const [textAreaData, setTextAreaData] = import_react2.default.useState("");
+  import_react2.useEffect(() => {
     try {
       const data2 = JSON.parse(textAreaData);
       setData({ type: "object", data: data2 });
@@ -23622,8 +23675,8 @@ var HelloComponent = () => {
       setTextAreaData("");
     }
   }, [textAreaData]);
-  const [keyViewed, setKeyViewed] = import_react.default.useState("");
-  const loadKey = import_react.useCallback(async (key) => {
+  const [keyViewed, setKeyViewed] = import_react2.default.useState("");
+  const loadKey = import_react2.useCallback(async (key) => {
     setKeyViewed(key);
     setLoading(true);
     const data2 = await dokDb.getData(key);
@@ -23631,29 +23684,29 @@ var HelloComponent = () => {
     setTextAreaData(JSON.stringify(data2.data, null, 2));
     setLoading(false);
   }, []);
-  const saveData = import_react.useCallback(async () => {
+  const saveData = import_react2.useCallback(async () => {
     if (data?.type === "object") {
       await dokDb.setData(keyViewed, data.data);
       loadKey(keyViewed);
     }
   }, [keyViewed, textAreaData]);
-  return jsx_dev_runtime.jsxDEV(jsx_dev_runtime.Fragment, {
+  return jsx_dev_runtime2.jsxDEV(jsx_dev_runtime2.Fragment, {
     children: [
-      jsx_dev_runtime.jsxDEV("button", {
+      jsx_dev_runtime2.jsxDEV("button", {
         type: "button",
         onClick: () => {
           list();
         },
         children: "List"
       }, undefined, false, undefined, this),
-      jsx_dev_runtime.jsxDEV(jsx_dev_runtime.Fragment, {
+      jsx_dev_runtime2.jsxDEV(jsx_dev_runtime2.Fragment, {
         children: keys.map(({ key, type }) => {
           if (type === "tree") {
-            return jsx_dev_runtime.jsxDEV("div", {
+            return jsx_dev_runtime2.jsxDEV("div", {
               children: key
             }, key, false, undefined, this);
           } else {
-            return jsx_dev_runtime.jsxDEV("button", {
+            return jsx_dev_runtime2.jsxDEV("button", {
               type: "button",
               onClick: async () => loadKey(key),
               children: [
@@ -23666,22 +23719,22 @@ var HelloComponent = () => {
           }
         })
       }, undefined, false, undefined, this),
-      jsx_dev_runtime.jsxDEV("hr", {}, undefined, false, undefined, this),
-      jsx_dev_runtime.jsxDEV(jsx_dev_runtime.Fragment, {
+      jsx_dev_runtime2.jsxDEV("hr", {}, undefined, false, undefined, this),
+      jsx_dev_runtime2.jsxDEV(jsx_dev_runtime2.Fragment, {
         children: keyViewed
       }, undefined, false, undefined, this),
-      jsx_dev_runtime.jsxDEV("hr", {}, undefined, false, undefined, this),
-      !loading && data?.type === "object" && jsx_dev_runtime.jsxDEV(jsx_dev_runtime.Fragment, {
+      jsx_dev_runtime2.jsxDEV("hr", {}, undefined, false, undefined, this),
+      !loading && data?.type === "object" && jsx_dev_runtime2.jsxDEV(jsx_dev_runtime2.Fragment, {
         children: [
-          jsx_dev_runtime.jsxDEV("textarea", {
+          jsx_dev_runtime2.jsxDEV("textarea", {
             cols: 100,
             rows: 20,
             title: "Data",
             value: textAreaData,
             onChange: (e) => setTextAreaData(e.target.value)
           }, undefined, false, undefined, this),
-          jsx_dev_runtime.jsxDEV("br", {}, undefined, false, undefined, this),
-          jsx_dev_runtime.jsxDEV("button", {
+          jsx_dev_runtime2.jsxDEV("br", {}, undefined, false, undefined, this),
+          jsx_dev_runtime2.jsxDEV("button", {
             type: "button",
             onClick: () => saveData(),
             title: "Click me",
@@ -23689,17 +23742,18 @@ var HelloComponent = () => {
           }, undefined, false, undefined, this)
         ]
       }, undefined, true, undefined, this),
-      !loading && data?.type === "blob" && jsx_dev_runtime.jsxDEV("img", {
+      !loading && data?.type === "blob" && jsx_dev_runtime2.jsxDEV("img", {
         title: data.url,
         src: data.url
       }, undefined, false, undefined, this),
-      loading && jsx_dev_runtime.jsxDEV("div", {
+      loading && jsx_dev_runtime2.jsxDEV("div", {
         children: "Loading..."
-      }, undefined, false, undefined, this)
+      }, undefined, false, undefined, this),
+      jsx_dev_runtime2.jsxDEV(Uploader, {}, undefined, false, undefined, this)
     ]
   }, undefined, true, undefined, this);
 };
-var root = client.createRoot(div);
-root.render(location.search.indexOf("strict-mode") >= 0 ? jsx_dev_runtime.jsxDEV(import_react2.StrictMode, {
-  children: jsx_dev_runtime.jsxDEV(HelloComponent, {}, undefined, false, undefined, this)
-}, undefined, false, undefined, this) : jsx_dev_runtime.jsxDEV(HelloComponent, {}, undefined, false, undefined, this));
+var root = client2.createRoot(div);
+root.render(location.search.indexOf("strict-mode") >= 0 ? jsx_dev_runtime2.jsxDEV(import_react3.StrictMode, {
+  children: jsx_dev_runtime2.jsxDEV(HelloComponent, {}, undefined, false, undefined, this)
+}, undefined, false, undefined, this) : jsx_dev_runtime2.jsxDEV(HelloComponent, {}, undefined, false, undefined, this));
