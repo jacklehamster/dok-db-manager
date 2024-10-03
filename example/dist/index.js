@@ -23651,7 +23651,7 @@ class DokDb {
 var jsx_dev_runtime2 = __toESM(require_jsx_dev_runtime(), 1);
 var div = document.body.appendChild(document.createElement("div"));
 var dokDb = new DokDb({
-  rootUrl: "http://localhost:3000",
+  rootUrl: window.location.origin,
   user: "jacklehamster",
   type: "newgrounds",
   session: "example",

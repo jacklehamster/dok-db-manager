@@ -10,7 +10,7 @@ import { DokDb, Uploader } from "dok-db-manager-client";
 const div = document.body.appendChild(document.createElement("div"));
 
 const dokDb = new DokDb({
-  rootUrl: "http://localhost:3000",
+  rootUrl: window.location.origin,
   user: "jacklehamster",
   type: "newgrounds",
   session: "example",
@@ -59,9 +59,6 @@ const HelloComponent = () => {
       loadKey(keyViewed);
     }
   }, [keyViewed, textAreaData]);
-
-  
-
 
   return <>
     <button type="button" onClick={() => {

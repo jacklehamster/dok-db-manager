@@ -2,6 +2,10 @@ import express from "express";
 import { DbApi } from "@dobuki/data-client";
 import { AuthManager } from "dok-auth";
 import { SetDataOptions } from "@the-brains/github-db";
+import multer from "multer";
+import mime from "mime";
+import { getCDNCacheUrl } from "./cdn-cache-url";
+import { extractFile } from "../file-upload/upload-utils";
 
 interface DataQuery {
   user?: string;
@@ -17,9 +21,11 @@ interface BodyQuery {
 interface Props {
   githubApi: DbApi;
   auth: AuthManager;
+  owner: string;
+  repo: string;
 }
 
-export function addPutDataRoute(app: express.Express, { githubApi, auth }: Props) {
+export function addPutDataRoute(app: express.Express, { githubApi, auth, owner, repo }: Props) {
   function cleanData(data: Record<string, any>) {
     for (let key in data) {
       if (data[key] === null || data[key] === undefined) {
@@ -55,4 +61,40 @@ export function addPutDataRoute(app: express.Express, { githubApi, auth }: Props
 
     return res.json({ ...result, ...authResult });
   });
+
+  const storage = multer.memoryStorage();
+  const upload = multer({ storage }); // Configure multer to save files to the 'uploads' directory
+
+  app.post("/upload/image", upload.single('image'), async (req, res) => {
+    // Access the uploaded file
+    const file = req.file;
+    if (!file) {
+      return res.status(400).send('No file uploaded.');
+    }
+
+    const query = req.query as {
+      user: string;
+      token?: string;
+      session?: string;
+      secret?: string;
+    };
+    const authResult = await auth.authenticatePayload({
+      userId: query.user,
+      authToken: query.token,
+      session: query.session,
+      secret: req.body.secret,
+    });
+    if (!authResult.authToken) {
+      return res.json({ success: false, message: "Unauthorized", authResult });
+    }
+    extractFile({
+      file: req.file,
+      repo,
+      owner,
+      githubApi,
+      authResult,
+      res,
+    })
+  });
+
 }

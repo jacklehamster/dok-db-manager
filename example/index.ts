@@ -13,7 +13,7 @@ app.use(function (req, res, next) {
   next();
 });
 
-const port = parseInt(process.env.PORT ?? "3000");
+const port = parseInt(process.env.PORT ?? "3001");
 
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/index.html");

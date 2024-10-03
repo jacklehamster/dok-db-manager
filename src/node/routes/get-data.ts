@@ -1,19 +1,11 @@
 import { DbApi } from "@dobuki/data-client";
 import express from "express";
+import { getCDNCacheUrl } from "./cdn-cache-url";
 
 interface Props {
   owner: string;
   repo: string;
   githubApi: DbApi;
-}
-
-async function getCDNCacheUrl(url: string) {
-  const params = new URLSearchParams();
-  params.set("url", url);
-  const cacheUrl = "https://5kx5ne03pg.execute-api.us-east-1.amazonaws.com/cache-grab?" + params.toString();
-  const response = await fetch(cacheUrl);
-  const json = await response.json();
-  return json?.url ?? null;;
 }
 
 export function addGetDataRoute(app: express.Express, { githubApi, owner, repo }: Props) {

@@ -64,5 +64,5 @@ export function addRoutes(app: express.Express, config: Config) {
   addSaveImageRoute(app, { githubApi, auth, owner: config.github.owner, repo: config.github.repo });
   addListRoute(app, { githubApi });
   addGetDataRoute(app, { githubApi, owner: config.github.owner, repo: config.github.repo });
-  addPutDataRoute(app, { githubApi, auth });
+  addPutDataRoute(app, { githubApi, auth, owner: config.github.owner, repo: config.github.repo });
 }
