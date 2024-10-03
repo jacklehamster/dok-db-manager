@@ -27,15 +27,15 @@ export async function extractFile({
     }
     // Get the image buffer from the file
     const { buffer, mimetype, originalname } = file;
-    // console.log(buffer, mimetype, originalname);
-    const filename = originalname.replace(/\.[^/.]+$/, '');
+    const extension = mime.extension(mimetype);
+    const filename = `${originalname.replace(/\.[^/.]+$/, '')}.${extension}`;
     // Convert the buffer to a Blob-like structure
     const saveResult = await githubApi.setData(
-      `image/${filename}.${mime.extension(mimetype)}`,
+      `image/${filename}`,
       new Blob([buffer], { type: mimetype })
     );
-    const webUrl = `https://${owner}.github.io/${repo}/data/image/${filename}.${mime.extension(mimetype)}`;
-    const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/refs/heads/main/data/image/${filename}.${mime.extension(mimetype)}`;
+    const webUrl = `https://${owner}.github.io/${repo}/data/image/${filename}`;
+    const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/refs/heads/main/data/image/${filename}`;
     const cdnUrl = await getCDNCacheUrl(rawUrl);
     return res.send({
       message: 'Uploaded', ...authResult,
