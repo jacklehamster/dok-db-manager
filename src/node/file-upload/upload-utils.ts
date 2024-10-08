@@ -31,7 +31,7 @@ export async function extractFile({
     const { buffer, mimetype, originalname } = file;
     console.log(buffer, mimetype, originalname);
     const extension = originalname.split(".")[1] ?? mime.extension(mimetype);
-    const filename = `${originalname.replace(/\.[^/.]+$/, '')}.${extension}`;
+    const filename = `${encodeURIComponent(originalname.replace(/\.[^/.]+$/, ''))}.${extension}`;
     // Convert the buffer to a Blob-like structure
     const saveResult = await githubApi.setData(
       `${subfolder}/${filename}`,
