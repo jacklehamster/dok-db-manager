@@ -95,6 +95,7 @@ export function addPutDataRoute(app: express.Express, { githubApi, auth, owner, 
         githubApi,
         authResult,
         res,
+        subfolder: type,
       })
     });
   });

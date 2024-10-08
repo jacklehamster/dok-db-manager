@@ -10,6 +10,7 @@ export async function extractFile({
   res,
   repo,
   owner,
+  subfolder = "image"
 }: {
   file?: Express.Multer.File;
   githubApi: DbApi;
@@ -20,6 +21,7 @@ export async function extractFile({
   };
   repo: string;
   owner: string;
+  subfolder?: string;
 }) {
   try {
     if (!file) {
@@ -27,15 +29,16 @@ export async function extractFile({
     }
     // Get the image buffer from the file
     const { buffer, mimetype, originalname } = file;
-    const extension = mime.extension(mimetype);
+    console.log(buffer, mimetype, originalname);
+    const extension = originalname.split(".")[1] ?? mime.extension(mimetype);
     const filename = `${originalname.replace(/\.[^/.]+$/, '')}.${extension}`;
     // Convert the buffer to a Blob-like structure
     const saveResult = await githubApi.setData(
-      `image/${filename}`,
+      `${subfolder}/${filename}`,
       new Blob([buffer], { type: mimetype })
     );
-    const webUrl = `https://${owner}.github.io/${repo}/data/image/${filename}`;
-    const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/refs/heads/main/data/image/${filename}`;
+    const webUrl = `https://${owner}.github.io/${repo}/data/${subfolder}/${filename}`;
+    const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/refs/heads/main/data/${subfolder}/${filename}`;
     const cdnUrl = await getCDNCacheUrl(rawUrl);
     return res.send({
       message: 'Uploaded', ...authResult,
