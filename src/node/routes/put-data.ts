@@ -3,8 +3,6 @@ import { DbApi } from "@dobuki/data-client";
 import { AuthManager } from "dok-auth";
 import { SetDataOptions } from "@the-brains/github-db";
 import multer from "multer";
-import mime from "mime";
-import { getCDNCacheUrl } from "./cdn-cache-url";
 import { extractFile } from "../file-upload/upload-utils";
 
 interface DataQuery {
