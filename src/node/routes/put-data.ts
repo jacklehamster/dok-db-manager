@@ -65,36 +65,39 @@ export function addPutDataRoute(app: express.Express, { githubApi, auth, owner, 
   const storage = multer.memoryStorage();
   const upload = multer({ storage }); // Configure multer to save files to the 'uploads' directory
 
-  app.post("/upload/image", upload.single('image'), async (req, res) => {
-    // Access the uploaded file
-    const file = req.file;
-    if (!file) {
-      return res.status(400).send('No file uploaded.');
-    }
+  const TYPES = ["image", "audio", "video"];
 
-    const query = req.query as {
-      user: string;
-      token?: string;
-      session?: string;
-      secret?: string;
-    };
-    const authResult = await auth.authenticatePayload({
-      userId: query.user,
-      authToken: query.token,
-      session: query.session,
-      secret: req.body.secret,
+  TYPES.forEach((type) => {
+    app.post(`/upload/${type}`, upload.single(type), async (req, res) => {
+      // Access the uploaded file
+      const file = req.file;
+      if (!file) {
+        return res.status(400).send('No file uploaded.');
+      }
+
+      const query = req.query as {
+        user: string;
+        token?: string;
+        session?: string;
+        secret?: string;
+      };
+      const authResult = await auth.authenticatePayload({
+        userId: query.user,
+        authToken: query.token,
+        session: query.session,
+        secret: req.body.secret,
+      });
+      if (!authResult.authToken) {
+        return res.json({ success: false, message: "Unauthorized", authResult });
+      }
+      extractFile({
+        file: req.file,
+        repo,
+        owner,
+        githubApi,
+        authResult,
+        res,
+      })
     });
-    if (!authResult.authToken) {
-      return res.json({ success: false, message: "Unauthorized", authResult });
-    }
-    extractFile({
-      file: req.file,
-      repo,
-      owner,
-      githubApi,
-      authResult,
-      res,
-    })
   });
-
 }
