@@ -61,7 +61,9 @@ export function addPutDataRoute(app: express.Express, { githubApi, auth, owner, 
   });
 
   const storage = multer.memoryStorage();
-  const upload = multer({ storage }); // Configure multer to save files to the 'uploads' directory
+  const upload = multer({
+    storage,
+  }); // Configure multer to save files to the 'uploads' directory
 
   const TYPES = ["image", "audio", "video"];
 

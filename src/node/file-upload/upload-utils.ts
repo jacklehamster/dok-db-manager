@@ -28,6 +28,7 @@ export async function extractFile({
       return res.status(400).send('No file uploaded.');
     }
     // Get the image buffer from the file
+    file.originalname = Buffer.from(file.originalname, 'latin1').toString('utf8');
     const { buffer, mimetype, originalname } = file;
     const extension = originalname.split(".").pop() ?? mime.extension(mimetype);
     const filename = `${encodeURIComponent(originalname.replace(/\.[^/.]+$/, ''))}.${extension}`;
