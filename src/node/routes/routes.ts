@@ -8,6 +8,9 @@ import { addListRoute } from "./list";
 import { addGetDataRoute } from "./get-data";
 import { addPutDataRoute } from "./put-data";
 import { RedisWrapConfig } from "@dobuki/data-client/dist/redis/redis-wrap";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export interface Config {
   redisConfig?: RedisWrapConfig;
@@ -16,11 +19,9 @@ export interface Config {
     repo: string;
   };
   newgrounds?: {
-    game?: string;
-    url?: string;
     key: string;
     skey: string;
-  };
+  }[];
   secret?: {
     secret: string;
   };
@@ -41,6 +42,14 @@ export function addRoutes(app: express.Express, config: Config) {
 
   const authData: Record<string, any> = {};
 
+  const newgroundsConfigs = config.newgrounds ?? [];
+  if (process.env.NEWGROUNDS_SKEY && process.env.NEWGROUNDS_KEY) {
+    newgroundsConfigs.push({
+      key: process.env.NEWGROUNDS_KEY,
+      skey: process.env.NEWGROUNDS_SKEY,
+    });
+  }
+
   const auth = new AuthManager(
     new AuthProvider(redisClient ?? {
       get: async (key) => (authData[key], null),
@@ -49,12 +58,10 @@ export function addRoutes(app: express.Express, config: Config) {
       quit: async () => "",
     }),
     [
-      config.newgrounds ? new NewgroundsAuthenticator({
-        game: config.newgrounds?.game,
-        url: config.newgrounds?.url,
-        key: config.newgrounds.key,
-        skey: process.env.NEWGROUND_SKEY!,
-      }) : null,
+      newgroundsConfigs.length ? new NewgroundsAuthenticator(newgroundsConfigs.map(({ key, skey }) => ({
+        key: key,
+        skey: skey,
+      }))) : null,
       config.secret ? new SecretAuthenticator({
         secretWord: config.secret.secret,
       }) : null,

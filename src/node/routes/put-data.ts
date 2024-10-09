@@ -80,12 +80,16 @@ export function addPutDataRoute(app: express.Express, { githubApi, auth, owner, 
         token?: string;
         session?: string;
         secret?: string;
+        type?: string;
+        key?: string;
       };
       const authResult = await auth.authenticatePayload({
         userId: query.user ?? req.body.user,
         authToken: query.token ?? req.body.token,
         session: query.session ?? req.body.session,
         secret: query.secret ?? req.body.secret,
+        type: query.type ?? req.body.type,
+        key: query.key ?? req.body.key,
       });
       if (!authResult.authToken) {
         return res.json({ success: false, message: "Unauthorized", authResult });
