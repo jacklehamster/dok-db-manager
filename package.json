@@ -55,7 +55,7 @@
   "dependencies": {
     "@dobuki/code-lock": "^1.0.12",
     "@dobuki/data-client": "^1.0.15",
-    "dok-auth": "^1.0.27",
+    "dok-auth": "^1.0.28",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "mime-types": "^2.1.35",
