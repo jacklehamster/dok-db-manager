@@ -23590,12 +23590,14 @@ class DokDb {
   session;
   secret;
   type;
-  constructor({ rootUrl, user, type, session, secret }) {
+  key;
+  constructor({ rootUrl, user, type, session, secret, key }) {
     this.rootUrl = rootUrl;
     this.user = user;
     this.type = type;
     this.session = session;
     this.secret = secret;
+    this.key = key;
   }
   async listKeys(subfolder, branch, recursive) {
     const params = new URLSearchParams;
@@ -23624,20 +23626,16 @@ class DokDb {
     } else {
       value = valueOrCall;
     }
-    const params = new URLSearchParams;
-    params.set("user", this.user);
-    if (this.token) {
-      params.set("token", this.token);
-    }
-    if (this.session) {
-      params.set("session", this.session);
-    }
-    if (this.secret) {
-      params.set("secret", this.secret);
-    }
-    const response = await fetch(`${this.rootUrl}/data/${key}?${params}`, {
+    const response = await fetch(`${this.rootUrl}/data/${key}`, {
       method: "PUT",
-      body: JSON.stringify(value),
+      body: JSON.stringify({
+        data: value,
+        user: this.user,
+        token: this.token,
+        session: this.session,
+        secret: this.secret,
+        key: this.key
+      }),
       headers: {
         "Content-Type": "application/json"
       }
@@ -23661,7 +23659,6 @@ var HelloComponent = () => {
   const [keys, setKeys] = import_react2.default.useState([]);
   const list = import_react2.useCallback(async () => {
     const data2 = await dokDb.listKeys();
-    console.log(data2);
     setKeys(data2);
   }, []);
   const [loading, setLoading] = import_react2.default.useState(false);
@@ -23672,7 +23669,7 @@ var HelloComponent = () => {
       const data2 = JSON.parse(textAreaData);
       setData({ type: "object", data: data2 });
     } catch (e) {
-      setTextAreaData("");
+      setData(undefined);
     }
   }, [textAreaData]);
   const [keyViewed, setKeyViewed] = import_react2.default.useState("");
@@ -23689,9 +23686,8 @@ var HelloComponent = () => {
       await dokDb.setData(keyViewed, data.data);
       loadKey(keyViewed);
     }
-  }, [keyViewed, textAreaData]);
+  }, [keyViewed, data]);
   const extension = import_react2.useMemo(() => data?.url?.split(".").pop(), [data?.url]);
-  console.log(extension, loading, data?.type);
   return jsx_dev_runtime2.jsxDEV(jsx_dev_runtime2.Fragment, {
     children: [
       jsx_dev_runtime2.jsxDEV("button", {
@@ -23726,7 +23722,7 @@ var HelloComponent = () => {
         children: keyViewed
       }, undefined, false, undefined, this),
       jsx_dev_runtime2.jsxDEV("hr", {}, undefined, false, undefined, this),
-      !loading && data?.type === "object" && jsx_dev_runtime2.jsxDEV(jsx_dev_runtime2.Fragment, {
+      !loading && textAreaData && jsx_dev_runtime2.jsxDEV(jsx_dev_runtime2.Fragment, {
         children: [
           jsx_dev_runtime2.jsxDEV("textarea", {
             cols: 100,

@@ -15,6 +15,7 @@ interface DataQuery {
 }
 
 interface BodyQuery {
+  data?: Record<string, any>;
 }
 
 interface Props {
@@ -38,24 +39,21 @@ export function addPutDataRoute(app: express.Express, { githubApi, auth, owner, 
     const path = (req.params as string[])[0];
     const query = req.query as DataQuery;
     const body = req.body as BodyQuery;
-    const authResult = await auth.authenticatePayload({
-      userId: query.user,
-      authToken: query.token,
-      session: query.session,
-      secret: query.secret,
-    });
+
+    const requestProps = unpackRequest(req);
+    const authResult = await auth.authenticatePayload(requestProps);
     if (!authResult.authToken) {
       return res.json({ success: false, message: "Unauthorized" });
     }
 
     const setDataOptions: SetDataOptions = {
       branch: query.branch ?? "main",
-      externalUsername: query.user,
+      externalUsername: requestProps.userId,
     }
 
     const result = await githubApi.setData(path, (data: any) => cleanData({
       ...data.data,
-      ...(body ?? {}),
+      ...(body.data ?? {}),
     }), setDataOptions);
 
     return res.json({ ...result, ...authResult });

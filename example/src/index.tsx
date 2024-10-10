@@ -26,7 +26,7 @@ const HelloComponent = () => {
   const [keys, setKeys] = React.useState<Key[]>([]);
   const list = useCallback(async () => {
     const data = await dokDb.listKeys();
-    console.log(data);
+    // console.log(data);
     setKeys(data);
   }, []);
   const [loading, setLoading] = React.useState(false);
@@ -38,7 +38,7 @@ const HelloComponent = () => {
       const data = JSON.parse(textAreaData);
       setData({type: "object", data});
     } catch (e) {
-      setTextAreaData("");
+      setData(undefined);
     }
   }, [textAreaData]);
 
@@ -58,10 +58,10 @@ const HelloComponent = () => {
       await dokDb.setData(keyViewed, data.data);
       loadKey(keyViewed);
     }
-  }, [keyViewed, textAreaData]);
+  }, [keyViewed, data]);
 
   const extension = useMemo(() => data?.url?.split(".").pop(), [data?.url]);
-  console.log(extension, loading, data?.type);
+  //console.log(extension, loading, data?.type);
 
   return <>
     <button type="button" onClick={() => {
@@ -79,7 +79,7 @@ const HelloComponent = () => {
     <hr></hr>
     <>{keyViewed}</>
     <hr></hr>
-    {!loading && data?.type === "object" && <>
+    {!loading && textAreaData && <>
       <textarea cols={100} rows={20} title="Data" value={textAreaData}
         onChange={e => setTextAreaData(e.target.value)}></textarea>
       <br></br>
