@@ -4,6 +4,7 @@ import { AuthManager } from "dok-auth";
 import { SetDataOptions } from "@the-brains/github-db";
 import multer from "multer";
 import { extractFile } from "../file-upload/upload-utils";
+import { unpackRequest } from "./request";
 
 interface DataQuery {
   user?: string;
@@ -75,26 +76,12 @@ export function addPutDataRoute(app: express.Express, { githubApi, auth, owner, 
         return res.status(400).send('No file uploaded.');
       }
 
-      const query = req.query as {
-        user: string;
-        token?: string;
-        session?: string;
-        secret?: string;
-        type?: string;
-        key?: string;
-      };
-      const authResult = await auth.authenticatePayload({
-        userId: query.user ?? req.body.user,
-        authToken: query.token ?? req.body.token,
-        session: query.session ?? req.body.session,
-        secret: query.secret ?? req.body.secret,
-        type: query.type ?? req.body.type,
-        key: query.key ?? req.body.key,
-      });
+      const requestProps = unpackRequest(req);
+      const authResult = await auth.authenticatePayload(requestProps);
       if (!authResult.authToken) {
         return res.json({ success: false, message: "Unauthorized", authResult });
       }
-      extractFile({
+      await extractFile({
         file: req.file,
         repo,
         owner,
@@ -102,6 +89,7 @@ export function addPutDataRoute(app: express.Express, { githubApi, auth, owner, 
         authResult,
         res,
         subfolder: type,
+        requestProps,
       })
     });
   });

@@ -3,6 +3,7 @@ import multer from "multer";
 import mime from "mime-types";
 import { DbApi } from "@dobuki/data-client";
 import { AuthManager } from "dok-auth";
+import { unpackRequest } from "./request";
 
 interface Props {
   owner: string;
@@ -31,18 +32,8 @@ export function addSaveImageRoute(app: express.Express, { githubApi, auth, owner
 
   // Route to handle image upload and save
   app.post('/save-image', upload.single('image'), async (req, res) => {
-    const query = req.query as {
-      user: string;
-      token?: string;
-      session?: string;
-      secret?: string;
-    };
-    const authResult = await auth.authenticatePayload({
-      userId: query.user,
-      authToken: query.token,
-      session: query.session,
-      secret: req.body.secret,
-    });
+    const requestProps = unpackRequest(req);
+    const authResult = await auth.authenticatePayload(requestProps);
     if (!authResult.authToken) {
       return res.json({ success: false, message: "Unauthorized", authResult });
     }
@@ -56,7 +47,10 @@ export function addSaveImageRoute(app: express.Express, { githubApi, auth, owner
       // Convert the buffer to a Blob-like structure
       const saveResult = await githubApi.setData(
         `image/${filename}.${mime.extension(mimetype)}`,
-        new Blob([buffer], { type: mimetype })
+        new Blob([buffer], { type: mimetype }),
+        {
+          externalUsername: `${requestProps.type}-${requestProps.userId}`,
+        }
       );
       return res.send({
         message: 'Uploaded', ...authResult,

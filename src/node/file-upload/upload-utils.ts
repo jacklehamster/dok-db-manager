@@ -2,6 +2,7 @@ import mime from "mime";
 import { getCDNCacheUrl } from "../routes/cdn-cache-url";
 import { DbApi } from "@dobuki/data-client";
 import { TokenResult } from "dok-auth";
+import { RequestProps } from "../routes/request";
 
 export async function extractFile({
   file,
@@ -10,7 +11,8 @@ export async function extractFile({
   res,
   repo,
   owner,
-  subfolder = "image"
+  subfolder = "image",
+  requestProps,
 }: {
   file?: Express.Multer.File;
   githubApi: DbApi;
@@ -22,6 +24,7 @@ export async function extractFile({
   repo: string;
   owner: string;
   subfolder?: string;
+  requestProps?: RequestProps;
 }) {
   try {
     if (!file) {
@@ -36,7 +39,9 @@ export async function extractFile({
     // Convert the buffer to a Blob-like structure
     const saveResult = await githubApi.setData(
       `${subfolder}/${filename}`,
-      new Blob([buffer], { type: mimetype })
+      new Blob([buffer], { type: mimetype }), {
+      externalUsername: requestProps?.userId ? `${requestProps?.type}-${requestProps?.userId}` : undefined,
+    }
     );
     const webUrl = `https://${owner}.github.io/${repo}/data/${subfolder}/${filename}`;
     const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/refs/heads/main/data/${subfolder}/${filename}`;
