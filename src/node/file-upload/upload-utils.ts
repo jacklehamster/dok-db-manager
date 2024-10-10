@@ -41,8 +41,7 @@ export async function extractFile({
       `${subfolder}/${filename}`,
       new Blob([buffer], { type: mimetype }), {
       externalUsername: requestProps?.userId ? `${requestProps?.type}-${requestProps?.userId}` : undefined,
-    }
-    );
+    });
     const webUrl = `https://${owner}.github.io/${repo}/data/${subfolder}/${filename}`;
     const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/refs/heads/main/data/${subfolder}/${filename}`;
     const cdnUrl = await getCDNCacheUrl(rawUrl);

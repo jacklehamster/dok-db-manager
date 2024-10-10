@@ -23690,6 +23690,8 @@ var HelloComponent = () => {
       loadKey(keyViewed);
     }
   }, [keyViewed, textAreaData]);
+  const extension = import_react2.useMemo(() => data?.url?.split(".").pop(), [data?.url]);
+  console.log(extension, loading, data?.type);
   return jsx_dev_runtime2.jsxDEV(jsx_dev_runtime2.Fragment, {
     children: [
       jsx_dev_runtime2.jsxDEV("button", {
@@ -23742,10 +23744,20 @@ var HelloComponent = () => {
           }, undefined, false, undefined, this)
         ]
       }, undefined, true, undefined, this),
-      !loading && data?.type === "blob" && jsx_dev_runtime2.jsxDEV("img", {
-        title: data.url,
-        src: data.url
+      !loading && data?.type === "blob" && (extension === "png" || extension === "jpg") && jsx_dev_runtime2.jsxDEV("img", {
+        title: data?.url,
+        src: data?.url
       }, undefined, false, undefined, this),
+      !loading && data?.type === "blob" && extension === "mp3" && jsx_dev_runtime2.jsxDEV("audio", {
+        controls: true,
+        children: [
+          jsx_dev_runtime2.jsxDEV("source", {
+            src: data.url,
+            type: "audio/mpeg"
+          }, undefined, false, undefined, this),
+          "Your browser does not support the audio element."
+        ]
+      }, undefined, true, undefined, this),
       loading && jsx_dev_runtime2.jsxDEV("div", {
         children: "Loading..."
       }, undefined, false, undefined, this),

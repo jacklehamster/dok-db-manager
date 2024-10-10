@@ -2,7 +2,7 @@
 /// <reference lib="dom" />
 /// <reference lib="dom.iterable" />
 
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { DokDb, Uploader } from "dok-db-manager-client";
@@ -60,6 +60,9 @@ const HelloComponent = () => {
     }
   }, [keyViewed, textAreaData]);
 
+  const extension = useMemo(() => data?.url?.split(".").pop(), [data?.url]);
+  console.log(extension, loading, data?.type);
+
   return <>
     <button type="button" onClick={() => {
       list();
@@ -84,7 +87,12 @@ const HelloComponent = () => {
         Save
       </button>
     </>}
-    {!loading && data?.type === "blob" && <img title={data.url} src={data.url} />}
+    {!loading && data?.type === "blob" && (extension === "png" || extension === "jpg") && <img title={data?.url} src={data?.url} />}
+    {!loading && data?.type === "blob" && extension === "mp3" && 
+    <audio controls>
+      <source src={data.url} type="audio/mpeg" />
+      Your browser does not support the audio element.
+    </audio>}
     {loading && <div>Loading...</div>}
     <Uploader />
   </>;
