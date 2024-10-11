@@ -61,6 +61,7 @@ export class DokDb implements DbApi {
       method: "PUT",
       body: JSON.stringify({
         data: value,
+        type: this.type,
         user: this.user,
         token: this.token,
         session: this.session,
@@ -71,6 +72,7 @@ export class DokDb implements DbApi {
         "Content-Type": "application/json",
       },
     });
+
     const result = await response.json() as { authToken?: string; };
     this.token = result.authToken;
     return result;
