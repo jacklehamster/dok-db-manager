@@ -30,7 +30,12 @@ export function addPutDataRoute(app: express.Express, { githubApi, auth, owner, 
     for (let key in data) {
       if (data[key] === null || data[key] === undefined) {
         delete data[key];
+      } else if (typeof data[key] === "object") {
+        data[key] = cleanData(data[key]);
+      } else if (typeof data[key] === "string") {
+        data[key] = encodeURIComponent(data[key]);
       }
+
     }
     return data;
   }
@@ -51,12 +56,12 @@ export function addPutDataRoute(app: express.Express, { githubApi, auth, owner, 
       externalUsername: requestProps.userId,
     }
 
-    const result = await githubApi.setData(path, (data: any) => cleanData({
+    const result = await githubApi.setData(path, !body.data ? null : (data: any) => ({
       ...data.data,
-      ...(body.data ?? {}),
+      ...cleanData({ ...(body.data ?? {}) }),
     }), setDataOptions);
 
-    return res.json({ ...result, ...authResult });
+    return res.json({ ...result, ...authResult, success: true });
   });
 
   const storage = multer.memoryStorage();
@@ -75,6 +80,7 @@ export function addPutDataRoute(app: express.Express, { githubApi, auth, owner, 
       }
 
       const requestProps = unpackRequest(req);
+      console.log("request", requestProps);
       const authResult = await auth.authenticatePayload(requestProps);
       if (!authResult.authToken) {
         return res.json({ success: false, message: "Unauthorized", authResult });

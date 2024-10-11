@@ -23630,6 +23630,7 @@ class DokDb {
       method: "PUT",
       body: JSON.stringify({
         data: value,
+        type: this.type,
         user: this.user,
         token: this.token,
         session: this.session,
