@@ -9,9 +9,24 @@ interface Props {
 }
 
 export function addGetDataRoute(app: express.Express, { githubApi, owner, repo }: Props) {
+  function uncleanData(data: Record<string, any>) {
+    for (let key in data) {
+      if (data[key] === null || data[key] === undefined) {
+        delete data[key];
+      } else if (typeof data[key] === "object") {
+        data[key] = uncleanData(data[key]);
+      } else if (typeof data[key] === "string") {
+        data[key] = decodeURIComponent(data[key]);
+      }
+
+    }
+    return data;
+  }
+
+
   app.get("/data/*", async (req, res) => {
     const path = (req.params as string[])[0];
-    const data = await githubApi.getData(path);
+    const data = uncleanData(await githubApi.getData(path));
     const rawUrl = data.url;
     const webUrl = `https://${owner}.github.io/${repo}/data/${path}`;
     const cdnUrl = rawUrl ? await getCDNCacheUrl(rawUrl) : null;
