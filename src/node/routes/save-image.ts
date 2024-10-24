@@ -4,6 +4,7 @@ import mime from "mime-types";
 import { DbApi } from "@dobuki/data-client";
 import { AuthManager } from "dok-auth";
 import { unpackRequest } from "./request";
+import { SetDataOptions } from "@the-brains/github-db";
 
 interface Props {
   owner: string;
@@ -45,16 +46,18 @@ export function addSaveImageRoute(app: express.Express, { githubApi, auth, owner
       const { buffer, mimetype, originalname } = req.file;
       const filename = originalname.replace(/\.[^/.]+$/, '');
       // Convert the buffer to a Blob-like structure
+      const options: SetDataOptions = {
+        externalUsername: `${requestProps.type}-${requestProps.userId}`,
+        repo: requestProps.repo ?? undefined,
+      };
       const saveResult = await githubApi.setData(
         `image/${filename}.${mime.extension(mimetype)}`,
         new Blob([buffer], { type: mimetype }),
-        {
-          externalUsername: `${requestProps.type}-${requestProps.userId}`,
-        }
+        options
       );
       return res.send({
         message: 'Uploaded', ...authResult,
-        url: `https://${owner}.github.io/${repo}/data/image/${filename}.${mime.extension(mimetype)}`,
+        url: `https://${requestProps.repo?.owner ?? owner}.github.io/${requestProps.repo?.name ?? repo}/data/image/${filename}.${mime.extension(mimetype)}`,
         saveResult,
       });
     } catch (error) {

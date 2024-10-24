@@ -6,7 +6,7 @@ import { RedisLock } from "@dobuki/code-lock";
 import { addSaveImageRoute } from "./save-image";
 import { addListRoute } from "./list";
 import { addGetDataRoute } from "./get-data";
-import { addPutDataRoute } from "./put-data";
+import { addPutDataRoute, addUploadRoute } from "./put-data";
 import { RedisWrapConfig } from "@dobuki/data-client/dist/redis/redis-wrap";
 import dotenv from "dotenv";
 
@@ -27,6 +27,7 @@ export interface Config {
   };
   nocache?: boolean;
   nolock?: boolean;
+  domain?: string;
 }
 
 export function addRoutes(app: express.Express, config: Config) {
@@ -72,4 +73,5 @@ export function addRoutes(app: express.Express, config: Config) {
   addListRoute(app, { githubApi });
   addGetDataRoute(app, { githubApi, owner: config.github.owner, repo: config.github.repo });
   addPutDataRoute(app, { githubApi, auth, owner: config.github.owner, repo: config.github.repo });
+  addUploadRoute(app, { githubApi, auth, owner: config.github.owner, repo: config.github.repo, domain: config.domain });
 }

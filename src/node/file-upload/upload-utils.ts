@@ -3,6 +3,7 @@ import { getCDNCacheUrl } from "../routes/cdn-cache-url";
 import { DbApi } from "@dobuki/data-client";
 import { TokenResult } from "dok-auth";
 import { RequestProps } from "../routes/request";
+import { SetDataOptions } from "@the-brains/github-db";
 
 export async function extractFile({
   file,
@@ -13,6 +14,7 @@ export async function extractFile({
   owner,
   subfolder = "image",
   requestProps,
+  domain,
 }: {
   file?: Express.Multer.File;
   githubApi: DbApi;
@@ -25,6 +27,7 @@ export async function extractFile({
   owner: string;
   subfolder?: string;
   requestProps?: RequestProps;
+  domain?: string;
 }) {
   try {
     if (!file) {
@@ -37,13 +40,15 @@ export async function extractFile({
     const filename = `${encodeURIComponent(originalname.replace(/\.[^/.]+$/, ''))}.${extension}`;
     // console.log(buffer, mimetype, filename);
     // Convert the buffer to a Blob-like structure
-    const saveResult = await githubApi.setData(
-      `${subfolder}/${filename}`,
-      new Blob([buffer], { type: mimetype }), {
+    const options: SetDataOptions = {
       externalUsername: requestProps?.userId ? `${requestProps?.type}-${requestProps?.userId}` : undefined,
-    });
-    const webUrl = `https://${owner}.github.io/${repo}/data/${subfolder}/${filename}`;
-    const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/refs/heads/main/data/${subfolder}/${filename}`;
+      repo: requestProps?.repo ?? undefined,
+    };
+    const path = `${subfolder}${requestProps?.group ? `/${requestProps.group}` : ""}/${filename}`;
+    const saveResult = await githubApi.setData(path, new Blob([buffer], { type: mimetype }), options);
+    const webDomain = domain ?? `https://${requestProps?.repo?.owner ?? owner}.github.io/${requestProps?.repo?.name ?? repo}`;
+    const webUrl = `${webDomain.startsWith("http") ? webDomain : `https://${webDomain}`}/data/${path}`;
+    const rawUrl = `https://raw.githubusercontent.com/${requestProps?.repo?.owner ?? owner}/${requestProps?.repo?.name ?? repo}/refs/heads/main/data/${path}`;
     const cdnUrl = await getCDNCacheUrl(rawUrl);
     return res.send({
       message: 'Uploaded', ...authResult,

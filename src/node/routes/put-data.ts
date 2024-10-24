@@ -23,9 +23,10 @@ interface Props {
   auth: AuthManager;
   owner: string;
   repo: string;
+  domain?: string;
 }
 
-export function addPutDataRoute(app: express.Express, { githubApi, auth, owner, repo }: Props) {
+export function addPutDataRoute(app: express.Express, { githubApi, auth }: Props) {
   function cleanData(data: Record<string, any>) {
     for (let key in data) {
       if (data[key] === null || data[key] === undefined) {
@@ -63,7 +64,9 @@ export function addPutDataRoute(app: express.Express, { githubApi, auth, owner, 
 
     return res.json({ ...result, ...authResult, success: true });
   });
+}
 
+export function addUploadRoute(app: express.Express, { githubApi, auth, owner, repo, domain }: Props) {
   const storage = multer.memoryStorage();
   const upload = multer({
     storage,
@@ -73,27 +76,26 @@ export function addPutDataRoute(app: express.Express, { githubApi, auth, owner, 
 
   TYPES.forEach((type) => {
     app.post(`/upload/${type}`, upload.single(type), async (req, res) => {
-      // Access the uploaded file
       const file = req.file;
       if (!file) {
         return res.status(400).send('No file uploaded.');
       }
 
       const requestProps = unpackRequest(req);
-      console.log("request", requestProps);
       const authResult = await auth.authenticatePayload(requestProps);
       if (!authResult.authToken) {
         return res.json({ success: false, message: "Unauthorized", authResult });
       }
       await extractFile({
         file: req.file,
-        repo,
-        owner,
+        repo: requestProps.repo?.name ?? repo,
+        owner: requestProps.repo?.owner ?? owner,
         githubApi,
         authResult,
         res,
         subfolder: type,
         requestProps,
+        domain: requestProps?.domain ?? domain,
       })
     });
   });

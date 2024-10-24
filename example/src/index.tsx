@@ -94,7 +94,13 @@ const HelloComponent = () => {
       Your browser does not support the audio element.
     </audio>}
     {loading && <div>Loading...</div>}
-    <Uploader />
+    <Uploader 
+    domain="art.dobuki.net"
+    group="example"
+    repo={{
+      owner: "dobuki",
+      name: "art-depot",
+    }} />
   </>;
 };
 

@@ -1,9 +1,18 @@
 /// <reference lib="dom" />
 
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import ReactDOM from "react-dom/client";
 
-export function Uploader() {
+interface Props {
+  repo?: {
+    owner: string;
+    name: string;
+  }
+  group?: string;
+  domain?: string;
+}
+
+export function Uploader({ repo, group, domain }: Props) {
   const [secret, setSecret] = React.useState("");
   useEffect(() => {
     setSecret(window.localStorage.getItem("secret") || "");
@@ -12,8 +21,17 @@ export function Uploader() {
     window.localStorage.setItem("secret", secret);
   }, [secret]);
 
+  const params = useMemo(() => {
+    return new URLSearchParams({
+      repoOwner: repo?.owner ?? "",
+      repoName: repo?.name ?? "",
+      ... group && { group },
+      ... domain && { domain },
+    });
+  }, [repo, group]);
+
   return <>
-    <form action="/save-image" method="post" encType="multipart/form-data">
+    <form action={`/upload/image?${params.toString()}`} method="post" encType="multipart/form-data">
       <div>
         <label htmlFor="secret">Secret</label>
         <input name="secret" id="secret" type="password" value={secret} onChange={e => setSecret(e.target.value)} />
@@ -25,7 +43,7 @@ export function Uploader() {
   </>;
 }
 
-export const insertUploaderInDiv = (div: HTMLDivElement) => {
+export const insertUploaderInDiv = (div: HTMLDivElement, repo: Props["repo"]) => {
   const root = ReactDOM.createRoot(div);
-  root.render(<Uploader />);
+  root.render(<Uploader repo={repo} />);
 };
