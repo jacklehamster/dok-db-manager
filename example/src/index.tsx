@@ -95,7 +95,6 @@ const HelloComponent = () => {
     </audio>}
     {loading && <div>Loading...</div>}
     <Uploader 
-    domain="art.dobuki.net"
     group="example"
     repo={{
       owner: "dobuki",

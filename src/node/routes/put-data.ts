@@ -23,7 +23,6 @@ interface Props {
   auth: AuthManager;
   owner: string;
   repo: string;
-  domain?: string;
 }
 
 export function addPutDataRoute(app: express.Express, { githubApi, auth }: Props) {
@@ -36,7 +35,6 @@ export function addPutDataRoute(app: express.Express, { githubApi, auth }: Props
       } else if (typeof data[key] === "string") {
         data[key] = encodeURIComponent(data[key]);
       }
-
     }
     return data;
   }
@@ -66,7 +64,7 @@ export function addPutDataRoute(app: express.Express, { githubApi, auth }: Props
   });
 }
 
-export function addUploadRoute(app: express.Express, { githubApi, auth, owner, repo, domain }: Props) {
+export function addUploadRoute(app: express.Express, { githubApi, auth, owner, repo }: Props) {
   const storage = multer.memoryStorage();
   const upload = multer({
     storage,
@@ -86,16 +84,19 @@ export function addUploadRoute(app: express.Express, { githubApi, auth, owner, r
       if (!authResult.authToken) {
         return res.json({ success: false, message: "Unauthorized", authResult });
       }
+      const dir = `${type}${requestProps?.group ? `/${requestProps.group}` : ""}`;
+
       await extractFile({
         file: req.file,
-        repo: requestProps.repo?.name ?? repo,
-        owner: requestProps.repo?.owner ?? owner,
+        repo: {
+          name: requestProps.repo?.name ?? repo,
+          owner: requestProps.repo?.owner ?? owner,
+        },
         githubApi,
         authResult,
         res,
-        subfolder: type,
-        requestProps,
-        domain: requestProps?.domain ?? domain,
+        dir,
+        externalUsername: requestProps?.userId ? `${requestProps?.type}-${requestProps?.userId}` : undefined,
       })
     });
   });

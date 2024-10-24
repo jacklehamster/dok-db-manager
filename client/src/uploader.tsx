@@ -9,10 +9,9 @@ interface Props {
     name: string;
   }
   group?: string;
-  domain?: string;
 }
 
-export function Uploader({ repo, group, domain }: Props) {
+export function Uploader({ repo, group }: Props) {
   const [secret, setSecret] = React.useState("");
   useEffect(() => {
     setSecret(window.localStorage.getItem("secret") || "");
@@ -26,7 +25,6 @@ export function Uploader({ repo, group, domain }: Props) {
       repoOwner: repo?.owner ?? "",
       repoName: repo?.name ?? "",
       ... group && { group },
-      ... domain && { domain },
     });
   }, [repo, group]);
 

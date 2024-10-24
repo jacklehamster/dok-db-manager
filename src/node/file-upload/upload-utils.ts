@@ -1,5 +1,5 @@
 import mime from "mime";
-import { getCDNCacheUrl } from "../routes/cdn-cache-url";
+import { getCDNCacheUrl, getHomepageUrl } from "../routes/cdn-cache-url";
 import { DbApi } from "@dobuki/data-client";
 import { TokenResult } from "dok-auth";
 import { RequestProps } from "../routes/request";
@@ -11,10 +11,8 @@ export async function extractFile({
   authResult,
   res,
   repo,
-  owner,
-  subfolder = "image",
-  requestProps,
-  domain,
+  externalUsername,
+  dir,
 }: {
   file?: Express.Multer.File;
   githubApi: DbApi;
@@ -23,11 +21,12 @@ export async function extractFile({
     status(status: number): any;
     send(data: any): any;
   };
-  repo: string;
-  owner: string;
-  subfolder?: string;
-  requestProps?: RequestProps;
-  domain?: string;
+  repo: {
+    name: string;
+    owner: string;
+  };
+  externalUsername?: string;
+  dir: string;
 }) {
   try {
     if (!file) {
@@ -41,15 +40,18 @@ export async function extractFile({
     // console.log(buffer, mimetype, filename);
     // Convert the buffer to a Blob-like structure
     const options: SetDataOptions = {
-      externalUsername: requestProps?.userId ? `${requestProps?.type}-${requestProps?.userId}` : undefined,
-      repo: requestProps?.repo ?? undefined,
+      externalUsername,
+      repo,
     };
-    const path = `${subfolder}${requestProps?.group ? `/${requestProps.group}` : ""}/${filename}`;
+    const path = `${dir}/${filename}`;
     const saveResult = await githubApi.setData(path, new Blob([buffer], { type: mimetype }), options);
-    const webDomain = domain ?? `https://${requestProps?.repo?.owner ?? owner}.github.io/${requestProps?.repo?.name ?? repo}`;
+    // check if we can grab the domain from github api
+    const [cdnUrl, webDomain] = await Promise.all([
+      getCDNCacheUrl(`https://raw.githubusercontent.com/${repo.owner}/${repo.name}/refs/heads/main/data/${path}`),
+      getHomepageUrl(repo.owner, repo.name).then((url) => url ?? `https://${repo.owner}.github.io/${repo.name}`),
+    ]);
+
     const webUrl = `${webDomain.startsWith("http") ? webDomain : `https://${webDomain}`}/data/${path}`;
-    const rawUrl = `https://raw.githubusercontent.com/${requestProps?.repo?.owner ?? owner}/${requestProps?.repo?.name ?? repo}/refs/heads/main/data/${path}`;
-    const cdnUrl = await getCDNCacheUrl(rawUrl);
     return res.send({
       message: 'Uploaded', ...authResult,
       url: cdnUrl ?? webUrl,

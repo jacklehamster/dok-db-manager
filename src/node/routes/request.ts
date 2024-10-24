@@ -10,7 +10,6 @@ interface AuthenticationQuery {
   repoName?: string;
   repoOwner?: string;
   group?: string;
-  domain?: string;
 }
 
 export interface RequestProps {
@@ -25,7 +24,6 @@ export interface RequestProps {
     name: string;
   }
   group?: string;
-  domain?: string;
 }
 
 export function unpackRequest(req: Request): RequestProps {
@@ -42,6 +40,5 @@ export function unpackRequest(req: Request): RequestProps {
       name: query.repoName
     } : undefined,
     group: query.group ?? req.body.group,
-    domain: query.domain ?? req.body.domain,
   };
 }

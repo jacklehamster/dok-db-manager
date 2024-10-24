@@ -23533,7 +23533,7 @@ var import_client2 = __toESM(require_client(), 1);
 var import_react = __toESM(require_react(), 1);
 var import_client = __toESM(require_client(), 1);
 var jsx_dev_runtime = __toESM(require_jsx_dev_runtime(), 1);
-function Uploader({ repo, group, domain }) {
+function Uploader({ repo, group }) {
   const [secret, setSecret] = import_react.default.useState("");
   import_react.useEffect(() => {
     setSecret(window.localStorage.getItem("secret") || "");
@@ -23545,8 +23545,7 @@ function Uploader({ repo, group, domain }) {
     return new URLSearchParams({
       repoOwner: repo?.owner ?? "",
       repoName: repo?.name ?? "",
-      ...group && { group },
-      ...domain && { domain }
+      ...group && { group }
     });
   }, [repo, group]);
   return /* @__PURE__ */ jsx_dev_runtime.jsxDEV(jsx_dev_runtime.Fragment, {
@@ -23767,7 +23766,6 @@ var HelloComponent = () => {
         children: "Loading..."
       }, undefined, false, undefined, this),
       /* @__PURE__ */ jsx_dev_runtime2.jsxDEV(Uploader, {
-        domain: "art.dobuki.net",
         group: "example",
         repo: {
           owner: "dobuki",
