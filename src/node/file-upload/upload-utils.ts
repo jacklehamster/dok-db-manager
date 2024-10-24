@@ -2,7 +2,6 @@ import mime from "mime";
 import { getCDNCacheUrl, getHomepageUrl } from "../routes/cdn-cache-url";
 import { DbApi } from "@dobuki/data-client";
 import { TokenResult } from "dok-auth";
-import { RequestProps } from "../routes/request";
 import { SetDataOptions } from "@the-brains/github-db";
 
 export async function extractFile({
@@ -51,7 +50,7 @@ export async function extractFile({
       getHomepageUrl(repo.owner, repo.name).then((url) => url ?? `https://${repo.owner}.github.io/${repo.name}`),
     ]);
 
-    const webUrl = `${webDomain.startsWith("http") ? webDomain : `https://${webDomain}`}/data/${path}`;
+    const webUrl = `${webDomain.startsWith("http") ? webDomain : `https://${webDomain}`}${webDomain.endsWith("/") ? "" : "/"}data/${path}`;
     return res.send({
       message: 'Uploaded', ...authResult,
       url: cdnUrl ?? webUrl,
