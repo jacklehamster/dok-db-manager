@@ -3,7 +3,6 @@ import { AuthManager, AuthProvider, NewgroundsAuthenticator, SecretAuthenticator
 import { CacheWrap, createRedisClient } from "@dobuki/data-client";
 import { getGithubDb } from "../github/getGithub";
 import { RedisLock } from "@dobuki/code-lock";
-import { addSaveImageRoute } from "./save-image";
 import { addListRoute } from "./list";
 import { addGetDataRoute } from "./get-data";
 import { addPutDataRoute, addUploadRoute } from "./put-data";
@@ -69,7 +68,6 @@ export function addRoutes(app: express.Express, config: Config) {
     ].filter(a => a),
   );
 
-  addSaveImageRoute(app, { githubApi, auth, owner: config.github.owner, repo: config.github.repo });
   addListRoute(app, { githubApi });
   addGetDataRoute(app, { githubApi, owner: config.github.owner, repo: config.github.repo });
   addPutDataRoute(app, { githubApi, auth, owner: config.github.owner, repo: config.github.repo });
