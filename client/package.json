@@ -5,9 +5,10 @@
   "module": "index.ts",
   "type": "module",
   "devDependencies": {
-    "@dobuki/auto-publish": "^1.0.20",
-    "@dobuki/data-client": "latest",
     "@types/bun": "^1.1.12"
+  },
+  "dependencies": {
+    "@dobuki/data-client": "latest"
   },
   "scripts": {
     "test": "bun test",
