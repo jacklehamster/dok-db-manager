@@ -33,7 +33,7 @@ export function addPutDataRoute(app: express.Express, { githubApi, auth }: Props
       } else if (typeof data[key] === "object") {
         data[key] = cleanData(data[key]);
       } else if (typeof data[key] === "string") {
-        data[key] = encodeURIComponent(data[key]);
+        data[key] = data[key].replace(/"/g, '%22');
       }
     }
     return data;
