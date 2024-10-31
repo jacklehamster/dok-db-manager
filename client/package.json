@@ -9,8 +9,7 @@
   },
   "dependencies": {
     "@dobuki/data-client": "latest",
-    "jssha": "^3.3.1",
-    "medal-popup": "^1.0.28"
+    "jssha": "^3.3.1"
   },
   "scripts": {
     "test": "bun test",

@@ -1,6 +1,5 @@
 import type { DbApi } from "@dobuki/data-client";
 import { encodeSecret } from "./encode";
-import type { Newgrounds } from "medal-popup";
 
 interface Props {
   rootUrl: string;
@@ -30,7 +29,7 @@ export class DokDb implements DbApi {
     this.user = user;
     this.type = type;
     this.session = session;
-    this.secret = secret;
+    this.secret = encodeSecret(secret);
     this.key = key;
   }
 
@@ -72,7 +71,7 @@ export class DokDb implements DbApi {
         user: this.user,
         token: this.token,
         session: this.session,
-        secret: encodeSecret(this.secret),
+        secret: this.secret,
         key: this.key,
       }),
       headers: {
@@ -104,7 +103,7 @@ export class DokDb implements DbApi {
     formData.append("group", group);
 
     if (this.secret) {
-      formData.append("secret", encodeSecret(this.secret));
+      formData.append("secret", this.secret);
     }
     if (this.user && this.session && this.key) {
       formData.append("type", this.type);
