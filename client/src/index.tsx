@@ -1,4 +1,5 @@
 import type { DbApi } from "@dobuki/data-client";
+import jsSHA from "jssha";
 
 interface Props {
   rootUrl: string;
@@ -65,7 +66,7 @@ export class DokDb implements DbApi {
         user: this.user,
         token: this.token,
         session: this.session,
-        secret: this.secret,
+        secret: this.encodeSecret(this.secret),
         key: this.key,
       }),
       headers: {
@@ -76,6 +77,12 @@ export class DokDb implements DbApi {
     const result = await response.json() as { authToken?: string; };
     this.token = result.authToken;
     return result;
+  }
+
+  private encodeSecret(secretWord?: string): string {
+    return new jsSHA("SHA-256", "TEXT", { encoding: "UTF8" })
+      .update(secretWord ?? "")
+      .getHash("HEX");
   }
 }
 
