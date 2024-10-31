@@ -1,5 +1,6 @@
 import type { DbApi } from "@dobuki/data-client";
-import jsSHA from "jssha";
+import { encodeSecret } from "./encode";
+import type { Newgrounds } from "medal-popup";
 
 interface Props {
   rootUrl: string;
@@ -8,6 +9,11 @@ interface Props {
   session: string;
   secret?: string;
   key?: string;
+}
+
+interface UrlPayload {
+  url: string;
+  backupUrl: string;
 }
 
 export class DokDb implements DbApi {
@@ -66,7 +72,7 @@ export class DokDb implements DbApi {
         user: this.user,
         token: this.token,
         session: this.session,
-        secret: this.encodeSecret(this.secret),
+        secret: encodeSecret(this.secret),
         key: this.key,
       }),
       headers: {
@@ -79,10 +85,53 @@ export class DokDb implements DbApi {
     return result;
   }
 
-  private encodeSecret(secretWord?: string): string {
-    return new jsSHA("SHA-256", "TEXT", { encoding: "UTF8" })
-      .update(secretWord ?? "")
-      .getHash("HEX");
+  async uploadData({
+    serverUrl,
+    name,
+    fileType,
+    file,
+    group,
+    secret,
+    newgrounds,
+    preUpload,
+  }: {
+    serverUrl: string;
+    name: string;
+    fileType: string;
+    file: File;
+    group: string;
+    secret?: string;
+    newgrounds?: Newgrounds;
+    preUpload?: () => Promise<void>;
+  }): Promise<UrlPayload | undefined> {
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append(fileType, file);
+    formData.append("group", group);
+
+    if (secret) {
+      formData.append("secret", encodeSecret(secret));
+    }
+    if (newgrounds?.user && newgrounds?.session) {
+      formData.append("type", "newgrounds");
+      formData.append("key", newgrounds?.key);
+      formData.append("user", newgrounds?.user);
+      formData.append("session", newgrounds?.session);
+    }
+
+    await preUpload?.();
+
+    const url = `${serverUrl}/upload/${fileType}`;
+    const json = await fetch(url, { method: "POST", body: formData }).then(res => res.json());
+
+    if (json.success) {
+      return new Promise<UrlPayload>(resolve => resolve({
+          url: json.url,
+          backupUrl: json.backupUrl,
+        }));
+    } else {
+      console.error(json);
+    }    
   }
 }
 
