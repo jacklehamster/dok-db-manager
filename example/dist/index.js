@@ -24197,6 +24197,11 @@ class ht {
   }
 }
 
+// ../client/src/encode.ts
+function encodeSecret(secretWord) {
+  return new ht("SHA-256", "TEXT", { encoding: "UTF8" }).update(secretWord ?? "").getHash("HEX");
+}
+
 // ../client/src/uploader.tsx
 var import_react = __toESM(require_react(), 1);
 var import_client = __toESM(require_client(), 1);
@@ -24309,7 +24314,7 @@ class DokDb {
         user: this.user,
         token: this.token,
         session: this.session,
-        secret: this.encodeSecret(this.secret),
+        secret: encodeSecret(this.secret),
         key: this.key
       }),
       headers: {
@@ -24320,8 +24325,40 @@ class DokDb {
     this.token = result.authToken;
     return result;
   }
-  encodeSecret(secretWord) {
-    return new ht("SHA-256", "TEXT", { encoding: "UTF8" }).update(secretWord ?? "").getHash("HEX");
+  async uploadData({
+    serverUrl,
+    name,
+    fileType,
+    file,
+    group,
+    secret,
+    newgrounds,
+    preUpload
+  }) {
+    const formData = new FormData;
+    formData.append("name", name);
+    formData.append(fileType, file);
+    formData.append("group", group);
+    if (secret) {
+      formData.append("secret", encodeSecret(secret));
+    }
+    if (newgrounds?.user && newgrounds?.session) {
+      formData.append("type", "newgrounds");
+      formData.append("key", newgrounds?.key);
+      formData.append("user", newgrounds?.user);
+      formData.append("session", newgrounds?.session);
+    }
+    await preUpload?.();
+    const url = `${serverUrl}/upload/${fileType}`;
+    const json = await fetch(url, { method: "POST", body: formData }).then((res) => res.json());
+    if (json.success) {
+      return new Promise((resolve) => resolve({
+        url: json.url,
+        backupUrl: json.backupUrl
+      }));
+    } else {
+      console.error(json);
+    }
   }
 }
 // src/index.tsx
