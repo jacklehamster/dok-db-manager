@@ -24326,30 +24326,27 @@ class DokDb {
     return result;
   }
   async uploadData({
-    serverUrl,
     name,
     fileType,
     file,
     group,
-    secret,
-    newgrounds,
     preUpload
   }) {
     const formData = new FormData;
     formData.append("name", name);
     formData.append(fileType, file);
     formData.append("group", group);
-    if (secret) {
-      formData.append("secret", encodeSecret(secret));
+    if (this.secret) {
+      formData.append("secret", encodeSecret(this.secret));
     }
-    if (newgrounds?.user && newgrounds?.session) {
-      formData.append("type", "newgrounds");
-      formData.append("key", newgrounds?.key);
-      formData.append("user", newgrounds?.user);
-      formData.append("session", newgrounds?.session);
+    if (this.user && this.session && this.key) {
+      formData.append("type", this.type);
+      formData.append("key", this.key);
+      formData.append("user", this.user);
+      formData.append("session", this.session);
     }
     await preUpload?.();
-    const url = `${serverUrl}/upload/${fileType}`;
+    const url = `${this.rootUrl}/upload/${fileType}`;
     const json = await fetch(url, { method: "POST", body: formData }).then((res) => res.json());
     if (json.success) {
       return new Promise((resolve) => resolve({
