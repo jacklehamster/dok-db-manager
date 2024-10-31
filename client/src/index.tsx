@@ -100,7 +100,7 @@ export class DokDb implements DbApi {
     fileType: string;
     file: File;
     group: string;
-    repo: Repo;
+    repo?: Repo;
     preUpload?: () => Promise<void>;
   }): Promise<UploadResult | undefined> {
     const formData = new FormData();
@@ -121,8 +121,10 @@ export class DokDb implements DbApi {
     await preUpload?.();
 
     const urlVars = new URLSearchParams();
-    urlVars.append("repoName", repo.name);
-    urlVars.append("repoOwner", repo.name);
+    if (repo) {
+      urlVars.append("repoName", repo.name);
+      urlVars.append("repoOwner", repo.name);  
+    }
     urlVars.append("group", group);
 
     const url = `${this.rootUrl}/upload/${fileType}${urlVars.size ? "?" + urlVars.toString() : ""}`;
