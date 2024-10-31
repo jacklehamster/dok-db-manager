@@ -84,21 +84,19 @@ export class DokDb implements DbApi {
     return result;
   }
 
-  async uploadData({
-    name,
+  async uploadFile({
     fileType,
     file,
     group,
     preUpload,
   }: {
-    name: string;
     fileType: string;
     file: File;
     group: string;
     preUpload?: () => Promise<void>;
   }): Promise<UrlPayload | undefined> {
     const formData = new FormData();
-    formData.append("name", name);
+    formData.append("name", file.name);
     formData.append(fileType, file);
     formData.append("group", group);
 
