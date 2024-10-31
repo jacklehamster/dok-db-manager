@@ -123,7 +123,7 @@ export class DokDb implements DbApi {
     const urlVars = new URLSearchParams();
     if (repo) {
       urlVars.append("repoName", repo.name);
-      urlVars.append("repoOwner", repo.name);  
+      urlVars.append("repoOwner", repo.owner);  
     }
     urlVars.append("group", group);
 
