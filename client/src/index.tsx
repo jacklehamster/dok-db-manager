@@ -131,10 +131,7 @@ export class DokDb implements DbApi {
     const json = await fetch(url, { method: "POST", body: formData }).then(res => res.json());
 
     if (json.success) {
-      return new Promise<UploadResult>(resolve => resolve({
-          url: json.url,
-          backupUrl: json.backupUrl,
-        }));
+      return json;
     } else {
       console.error(json);
     }    
