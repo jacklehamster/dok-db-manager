@@ -86,22 +86,16 @@ export class DokDb implements DbApi {
   }
 
   async uploadData({
-    serverUrl,
     name,
     fileType,
     file,
     group,
-    secret,
-    newgrounds,
     preUpload,
   }: {
-    serverUrl: string;
     name: string;
     fileType: string;
     file: File;
     group: string;
-    secret?: string;
-    newgrounds?: Newgrounds;
     preUpload?: () => Promise<void>;
   }): Promise<UrlPayload | undefined> {
     const formData = new FormData();
@@ -109,19 +103,19 @@ export class DokDb implements DbApi {
     formData.append(fileType, file);
     formData.append("group", group);
 
-    if (secret) {
-      formData.append("secret", encodeSecret(secret));
+    if (this.secret) {
+      formData.append("secret", encodeSecret(this.secret));
     }
-    if (newgrounds?.user && newgrounds?.session) {
-      formData.append("type", "newgrounds");
-      formData.append("key", newgrounds?.key);
-      formData.append("user", newgrounds?.user);
-      formData.append("session", newgrounds?.session);
+    if (this.user && this.session && this.key) {
+      formData.append("type", this.type);
+      formData.append("key", this.key);
+      formData.append("user", this.user);
+      formData.append("session", this.session);
     }
 
     await preUpload?.();
 
-    const url = `${serverUrl}/upload/${fileType}`;
+    const url = `${this.rootUrl}/upload/${fileType}`;
     const json = await fetch(url, { method: "POST", body: formData }).then(res => res.json());
 
     if (json.success) {
