@@ -1,7 +1,7 @@
 {
   "name": "dok-db-manager-client",
   "description": "Managing data client with a nice UI",
-  "version": "1.0.36",
+  "version": "1.0.37",
   "module": "index.ts",
   "type": "module",
   "devDependencies": {

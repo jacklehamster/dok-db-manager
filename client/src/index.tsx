@@ -10,7 +10,8 @@ interface Props {
   key?: string;
 }
 
-interface UrlPayload {
+interface UploadResult {
+  success?: boolean;
   url: string;
   backupUrl: string;
 }
@@ -94,7 +95,7 @@ export class DokDb implements DbApi {
     file: File;
     group: string;
     preUpload?: () => Promise<void>;
-  }): Promise<UrlPayload | undefined> {
+  }): Promise<UploadResult | undefined> {
     const formData = new FormData();
     formData.append("name", file.name);
     formData.append(fileType, file);
@@ -116,7 +117,7 @@ export class DokDb implements DbApi {
     const json = await fetch(url, { method: "POST", body: formData }).then(res => res.json());
 
     if (json.success) {
-      return new Promise<UrlPayload>(resolve => resolve({
+      return new Promise<UploadResult>(resolve => resolve({
           url: json.url,
           backupUrl: json.backupUrl,
         }));
