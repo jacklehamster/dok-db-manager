@@ -16,6 +16,11 @@ interface UploadResult {
   backupUrl: string;
 }
 
+interface Repo {
+  owner: string;
+  name: string;
+}
+
 export class DokDb implements DbApi {
   rootUrl: string;
   user: string;
@@ -90,10 +95,12 @@ export class DokDb implements DbApi {
     file,
     group,
     preUpload,
+    repo,
   }: {
     fileType: string;
     file: File;
     group: string;
+    repo: Repo;
     preUpload?: () => Promise<void>;
   }): Promise<UploadResult | undefined> {
     const formData = new FormData();
@@ -113,7 +120,12 @@ export class DokDb implements DbApi {
 
     await preUpload?.();
 
-    const url = `${this.rootUrl}/upload/${fileType}`;
+    const urlVars = new URLSearchParams();
+    urlVars.append("repoName", repo.name);
+    urlVars.append("repoOwner", repo.name);
+    urlVars.append("group", group);
+
+    const url = `${this.rootUrl}/upload/${fileType}${urlVars.size ? "?" + urlVars.toString() : ""}`;
     const json = await fetch(url, { method: "POST", body: formData }).then(res => res.json());
 
     if (json.success) {
