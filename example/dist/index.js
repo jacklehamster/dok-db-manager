@@ -24298,7 +24298,7 @@ class DokDb {
     const response = await fetch(`${this.rootUrl}/data/${key}`);
     return response.json();
   }
-  async setData(key, valueOrCall) {
+  async setData(key, valueOrCall, options) {
     let value;
     if (typeof valueOrCall === "function") {
       const data = await this.getData(key);
@@ -24306,7 +24306,12 @@ class DokDb {
     } else {
       value = valueOrCall;
     }
-    const response = await fetch(`${this.rootUrl}/data/${key}`, {
+    const urlVars = new URLSearchParams;
+    if (options.repo) {
+      urlVars.append("repoName", options.repo.name);
+      urlVars.append("repoOwner", options.repo.owner);
+    }
+    const response = await fetch(`${this.rootUrl}/data/${key}${urlVars.size ? "?" + urlVars.toString() : ""}`, {
       method: "PUT",
       body: JSON.stringify({
         data: value,
