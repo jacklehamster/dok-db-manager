@@ -24298,7 +24298,7 @@ class DokDb {
     const response = await fetch(`${this.rootUrl}/data/${key}`);
     return response.json();
   }
-  async setData(key, valueOrCall, options) {
+  async setData(key, valueOrCall, options = {}) {
     let value;
     if (typeof valueOrCall === "function") {
       const data = await this.getData(key);
