@@ -59,10 +59,14 @@ export function addPutDataRoute(app: express.Express, { githubApi, auth, owner, 
       },
     }
 
-    const result = await githubApi.setData(path, !body.data ? null : (data: any) => ({
-      ...data.data,
-      ...cleanData({ ...(body.data ?? {}) }),
-    }), setDataOptions);
+    const result = await githubApi.setData(path, !body.data ? null : (data: any) => {
+      const savedData = {
+        ...data.data,
+        ...cleanData({ ...(body.data ?? {}) }),
+      };
+      console.log(path, savedData, setDataOptions);
+      return savedData;
+    }, setDataOptions);
 
     return res.json({ ...result, ...authResult, success: true });
   });

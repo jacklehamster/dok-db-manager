@@ -2,7 +2,7 @@
   "name": "dok-db-manager",
   "module": "src/index.ts",
   "description": "Managing data client with a nice UI",
-  "version": "1.0.47",
+  "version": "1.0.49",
   "keywords": [
     "bun",
     "bunjs",
@@ -52,8 +52,8 @@
   "dependencies": {
     "@dobuki/code-lock": "latest",
     "@dobuki/data-client": "latest",
+    "@the-brains/github-db": "^1.0.18",
     "dok-auth": "latest",
-    "@the-brains/github-db": "^1.0.16",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "mime-types": "^2.1.35",
