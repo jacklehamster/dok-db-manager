@@ -1,5 +1,6 @@
 import type { DbApi } from "@dobuki/data-client";
 import { encodeSecret } from "./encode";
+import type { SetDataOptions } from "@the-brains/github-db";
 
 interface Props {
   rootUrl: string;
@@ -60,7 +61,7 @@ export class DokDb implements DbApi {
     return response.json() as Promise<{ data: any; type?: string | null; sha: string | null; }>;
   }
 
-  async setData(key: string, valueOrCall: any): Promise<any> {
+  async setData(key: string, valueOrCall: any, options: SetDataOptions): Promise<any> {
     let value;
     if (typeof (valueOrCall) === "function") {
       const data = await this.getData(key);
@@ -69,7 +70,13 @@ export class DokDb implements DbApi {
       value = valueOrCall;
     }
 
-    const response = await fetch(`${this.rootUrl}/data/${key}`, {
+    const urlVars = new URLSearchParams();
+    if (options.repo) {
+      urlVars.append("repoName", options.repo.name);
+      urlVars.append("repoOwner", options.repo.owner);
+    }
+
+    const response = await fetch(`${this.rootUrl}/data/${key}${urlVars.size?"?" + urlVars.toString():""}`, {
       method: "PUT",
       body: JSON.stringify({
         data: value,
