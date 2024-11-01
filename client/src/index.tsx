@@ -61,8 +61,8 @@ export class DokDb implements DbApi {
   }
 
   async setData(key: string, valueOrCall: any, options: {
-    repo: Repo;
-  }): Promise<any> {
+    repo?: Repo;
+  } = {}): Promise<any> {
     let value;
     if (typeof (valueOrCall) === "function") {
       const data = await this.getData(key);
