@@ -25,7 +25,7 @@ interface Props {
   repo: string;
 }
 
-export function addPutDataRoute(app: express.Express, { githubApi, auth }: Props) {
+export function addPutDataRoute(app: express.Express, { githubApi, auth, owner, repo }: Props) {
   function cleanData(data: Record<string, any>) {
     for (let key in data) {
       if (data[key] === null || data[key] === undefined) {
@@ -53,6 +53,10 @@ export function addPutDataRoute(app: express.Express, { githubApi, auth }: Props
     const setDataOptions: SetDataOptions = {
       branch: query.branch ?? "main",
       externalUsername: requestProps.userId,
+      repo: {
+        name: requestProps.repo?.name ?? repo,
+        owner: requestProps.repo?.owner ?? owner,
+      },
     }
 
     const result = await githubApi.setData(path, !body.data ? null : (data: any) => ({

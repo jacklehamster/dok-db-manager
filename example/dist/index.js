@@ -24276,7 +24276,7 @@ class DokDb {
     this.user = user;
     this.type = type;
     this.session = session;
-    this.secret = secret;
+    this.secret = encodeSecret(secret);
     this.key = key;
   }
   async listKeys(subfolder, branch, recursive) {
@@ -24314,7 +24314,7 @@ class DokDb {
         user: this.user,
         token: this.token,
         session: this.session,
-        secret: encodeSecret(this.secret),
+        secret: this.secret,
         key: this.key
       }),
       headers: {
@@ -24325,19 +24325,19 @@ class DokDb {
     this.token = result.authToken;
     return result;
   }
-  async uploadData({
-    name,
+  async uploadFile({
     fileType,
     file,
     group,
-    preUpload
+    preUpload,
+    repo
   }) {
     const formData = new FormData;
-    formData.append("name", name);
+    formData.append("name", file.name);
     formData.append(fileType, file);
     formData.append("group", group);
     if (this.secret) {
-      formData.append("secret", encodeSecret(this.secret));
+      formData.append("secret", this.secret);
     }
     if (this.user && this.session && this.key) {
       formData.append("type", this.type);
@@ -24346,13 +24346,16 @@ class DokDb {
       formData.append("session", this.session);
     }
     await preUpload?.();
-    const url = `${this.rootUrl}/upload/${fileType}`;
+    const urlVars = new URLSearchParams;
+    if (repo) {
+      urlVars.append("repoName", repo.name);
+      urlVars.append("repoOwner", repo.owner);
+    }
+    urlVars.append("group", group);
+    const url = `${this.rootUrl}/upload/${fileType}${urlVars.size ? "?" + urlVars.toString() : ""}`;
     const json = await fetch(url, { method: "POST", body: formData }).then((res) => res.json());
     if (json.success) {
-      return new Promise((resolve) => resolve({
-        url: json.url,
-        backupUrl: json.backupUrl
-      }));
+      return json;
     } else {
       console.error(json);
     }
