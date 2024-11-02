@@ -59,14 +59,10 @@ export function addPutDataRoute(app: express.Express, { githubApi, auth, owner, 
       },
     }
 
-    const result = await githubApi.setData(path, !body.data ? null : (data: any) => {
-      const savedData = {
-        ...data.data,
-        ...cleanData({ ...(body.data ?? {}) }),
-      };
-      console.log(path, savedData, setDataOptions);
-      return savedData;
-    }, setDataOptions);
+    const result = await githubApi.setData(path, !body.data ? null : typeof (body.data) === "string" ? body.data : (data: any) => ({
+      ...data.data,
+      ...cleanData({ ...(body.data ?? {}) }),
+    }), setDataOptions);
 
     return res.json({ ...result, ...authResult, success: true });
   });
@@ -78,7 +74,7 @@ export function addUploadRoute(app: express.Express, { githubApi, auth, owner, r
     storage,
   }); // Configure multer to save files to the 'uploads' directory
 
-  const TYPES = ["image", "audio", "video"];
+  const TYPES = ["image", "audio", "video", "bin"];
 
   TYPES.forEach((type) => {
     app.post(`/upload/${type}`, upload.single(type), async (req, res) => {
@@ -92,7 +88,7 @@ export function addUploadRoute(app: express.Express, { githubApi, auth, owner, r
       if (!authResult.authToken) {
         return res.json({ success: false, message: "Unauthorized", authResult });
       }
-      const dir = `${type}${requestProps?.group ? `/${requestProps.group}` : ""}`;
+      const dir = `${type === "bin" ? "" : type}${requestProps?.group ? `/${requestProps.group}` : ""}`;
 
       await extractFile({
         file: req.file,
