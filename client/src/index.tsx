@@ -144,6 +144,53 @@ export class DokDb implements DbApi {
       console.error(json);
     }    
   }
+
+  async uploadBlob({
+    name,
+    blob,
+    repo,
+    group,
+    preUpload,
+   } : {
+    name: string;
+    blob: Blob;
+    repo: { name: string; owner: string };
+    group: string;
+    preUpload?: () => Promise<void>;
+  }) {
+    const formData = new FormData();
+    formData.append("file", blob, name);
+  
+    // Append other necessary fields
+    if (this.secret) {
+      formData.append("secret", this.secret);
+    }
+    if (this.user && this.session && this.key) {
+      formData.append("type", this.type);
+      formData.append("key", this.key);
+      formData.append("user", this.user);
+      formData.append("session", this.session);
+    }
+  
+    await preUpload?.();
+  
+    const urlVars = new URLSearchParams();
+    if (repo) {
+      urlVars.append("repoName", repo.name);
+      urlVars.append("repoOwner", repo.owner);  
+    }
+    urlVars.append("group", group);
+  
+    const url = `${this.rootUrl}/upload/bin${urlVars.size ? "?" + urlVars.toString() : ""}`;
+    const json = await fetch(url, { method: "POST", body: formData }).then(res => res.json());
+  
+    if (json.success) {
+      return json;
+    } else {
+      console.error(json);
+      throw new Error("Upload failed");
+    }
+  }  
 }
 
 export * from "./uploader";
