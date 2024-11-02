@@ -24365,6 +24365,40 @@ class DokDb {
       console.error(json);
     }
   }
+  async uploadBlob({
+    name,
+    blob,
+    repo,
+    group,
+    preUpload
+  }) {
+    const formData = new FormData;
+    formData.append("file", blob, name);
+    if (this.secret) {
+      formData.append("secret", this.secret);
+    }
+    if (this.user && this.session && this.key) {
+      formData.append("type", this.type);
+      formData.append("key", this.key);
+      formData.append("user", this.user);
+      formData.append("session", this.session);
+    }
+    await preUpload?.();
+    const urlVars = new URLSearchParams;
+    if (repo) {
+      urlVars.append("repoName", repo.name);
+      urlVars.append("repoOwner", repo.owner);
+    }
+    urlVars.append("group", group);
+    const url = `${this.rootUrl}/upload/bin${urlVars.size ? "?" + urlVars.toString() : ""}`;
+    const json = await fetch(url, { method: "POST", body: formData }).then((res) => res.json());
+    if (json.success) {
+      return json;
+    } else {
+      console.error(json);
+      throw new Error("Upload failed");
+    }
+  }
 }
 // src/index.tsx
 var jsx_dev_runtime2 = __toESM(require_jsx_dev_runtime(), 1);

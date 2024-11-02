@@ -112,7 +112,6 @@ export class DokDb implements DbApi {
     preUpload?: () => Promise<void>;
   }): Promise<UploadResult | undefined> {
     const formData = new FormData();
-    formData.append("name", file.name);
     formData.append(fileType, file);
     formData.append("group", group);
 
@@ -159,7 +158,7 @@ export class DokDb implements DbApi {
     preUpload?: () => Promise<void>;
   }) {
     const formData = new FormData();
-    formData.append("file", blob, name);
+    formData.append("bin", blob, name);
   
     // Append other necessary fields
     if (this.secret) {
