@@ -12,6 +12,7 @@ export async function extractFile({
   repo,
   externalUsername,
   dir,
+  moderator,
 }: {
   file?: Express.Multer.File;
   githubApi: DbApi;
@@ -26,6 +27,7 @@ export async function extractFile({
   };
   externalUsername?: string;
   dir: string;
+  moderator?: (imageUrl: string) => Promise<boolean>;
 }) {
   try {
     if (!file) {
@@ -42,6 +44,7 @@ export async function extractFile({
       externalUsername,
       repo,
     };
+
     const path = `${dir}/${filename}`;
     const saveResult = await githubApi.setData(path, new Blob([buffer], { type: mimetype }), options);
     // check if we can grab the domain from github api
@@ -49,6 +52,9 @@ export async function extractFile({
       getCDNCacheUrl(`https://raw.githubusercontent.com/${repo.owner}/${repo.name}/refs/heads/main/data/${path}`),
       getHomepageUrl(repo.owner, repo.name).then((url) => url ?? `https://${repo.owner}.github.io/${repo.name}`),
     ]);
+    if (cdnUrl && moderator && !await moderator(cdnUrl)) {
+      return res.status(403).send('Forbidden');
+    }
 
     const webUrl = `${webDomain.startsWith("http") ? webDomain : `https://${webDomain}`}${webDomain.endsWith("/") ? "" : "/"}data/${path}`;
     return res.send({

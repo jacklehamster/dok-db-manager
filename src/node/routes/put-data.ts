@@ -23,6 +23,7 @@ interface Props {
   auth: AuthManager;
   owner: string;
   repo: string;
+  moderator?: (imageUrl: string) => Promise<boolean>;
 }
 
 export function addPutDataRoute(app: express.Express, { githubApi, auth, owner, repo }: Props) {
@@ -68,7 +69,7 @@ export function addPutDataRoute(app: express.Express, { githubApi, auth, owner, 
   });
 }
 
-export function addUploadRoute(app: express.Express, { githubApi, auth, owner, repo }: Props) {
+export function addUploadRoute(app: express.Express, { githubApi, auth, owner, repo, moderator }: Props) {
   const storage = multer.memoryStorage();
   const upload = multer({
     storage,
@@ -101,6 +102,7 @@ export function addUploadRoute(app: express.Express, { githubApi, auth, owner, r
         res,
         dir,
         externalUsername: requestProps?.userId ? `${requestProps?.type}-${requestProps?.userId}` : undefined,
+        moderator: type === "image" ? moderator : undefined,
       })
     });
   });
