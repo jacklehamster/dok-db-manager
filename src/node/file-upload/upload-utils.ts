@@ -45,8 +45,9 @@ export async function extractFile({
       repo,
     };
 
-    const path = `${dir}/${filename}`;
+    const path = `${dir ? `${dir}/` : ""}${filename}`;
     const saveResult = await githubApi.setData(path, new Blob([buffer], { type: mimetype }), options);
+
     // check if we can grab the domain from github api
     const [cdnUrl, webDomain] = await Promise.all([
       getCDNCacheUrl(`https://raw.githubusercontent.com/${repo.owner}/${repo.name}/refs/heads/main/data/${path}`),
@@ -59,10 +60,11 @@ export async function extractFile({
     const webUrl = `${webDomain.startsWith("http") ? webDomain : `https://${webDomain}`}${webDomain.endsWith("/") ? "" : "/"}data/${path}`;
     return res.send({
       message: 'Uploaded', ...authResult,
+      path,
       url: cdnUrl ?? webUrl,
       backupUrl: !cdnUrl ? undefined : webUrl,
       saveResult,
-      success: true,
+      success: !!saveResult.sha,
     });
   } catch (error) {
     console.error('Error processing request:', error);

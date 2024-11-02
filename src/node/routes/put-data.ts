@@ -5,6 +5,7 @@ import { SetDataOptions } from "@the-brains/github-db";
 import multer from "multer";
 import { extractFile } from "../file-upload/upload-utils";
 import { unpackRequest } from "./request";
+import { getCDNCacheUrl, getHomepageUrl } from "./cdn-cache-url";
 
 interface DataQuery {
   user?: string;
@@ -63,9 +64,26 @@ export function addPutDataRoute(app: express.Express, { githubApi, auth, owner, 
     const result = await githubApi.setData(path, !body.data ? null : typeof (body.data) === "string" ? body.data : (data: any) => ({
       ...data.data,
       ...cleanData({ ...(body.data ?? {}) }),
+      path,
     }), setDataOptions);
 
-    return res.json({ ...result, ...authResult, success: true });
+    let webUrl, cdnUrl;
+    if (setDataOptions.repo) {
+      const repo = setDataOptions.repo;
+      const [cdnU, webDomain] = await Promise.all([
+        getCDNCacheUrl(`https://raw.githubusercontent.com/${repo.owner}/${repo.name}/refs/heads/main/data/${path}`),
+        getHomepageUrl(repo.owner, repo.name).then((url) => url ?? `https://${repo.owner}.github.io/${repo.name}`),
+      ]);
+      webUrl = `${webDomain.startsWith("http") ? webDomain : `https://${webDomain}`}${webDomain.endsWith("/") ? "" : "/"}data/${path}`;
+      cdnUrl = cdnU;
+    }
+
+    return res.json({
+      ...result, ...authResult,
+      success: !!result.sha,
+      url: cdnUrl ?? webUrl,
+      backupUrl: !cdnUrl ? undefined : webUrl,
+    });
   });
 }
 

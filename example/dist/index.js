@@ -24271,12 +24271,12 @@ class DokDb {
   secret;
   type;
   key;
-  constructor({ rootUrl, user, type, session, secret, key }) {
+  constructor({ rootUrl, user, type, session, secret, secretHash, key }) {
     this.rootUrl = rootUrl;
     this.user = user;
     this.type = type;
     this.session = session;
-    this.secret = encodeSecret(secret);
+    this.secret = secretHash ?? encodeSecret(secret);
     this.key = key;
   }
   async listKeys(subfolder, branch, recursive) {
