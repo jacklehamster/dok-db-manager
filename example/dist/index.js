@@ -24338,7 +24338,6 @@ class DokDb {
     repo
   }) {
     const formData = new FormData;
-    formData.append("name", file.name);
     formData.append(fileType, file);
     formData.append("group", group);
     if (this.secret) {
@@ -24373,7 +24372,7 @@ class DokDb {
     preUpload
   }) {
     const formData = new FormData;
-    formData.append("file", blob, name);
+    formData.append("bin", blob, name);
     if (this.secret) {
       formData.append("secret", this.secret);
     }

@@ -88,7 +88,7 @@ export function addUploadRoute(app: express.Express, { githubApi, auth, owner, r
       if (!authResult.authToken) {
         return res.json({ success: false, message: "Unauthorized", authResult });
       }
-      const dir = `${type === "bin" ? "" : type}${requestProps?.group ? `/${requestProps.group}` : ""}`;
+      const dir = `${type === "bin" ? "" : `${type}/`}${requestProps?.group ? `${requestProps.group}` : ""}`;
 
       await extractFile({
         file: req.file,
