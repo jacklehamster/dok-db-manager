@@ -7,6 +7,7 @@ interface Props {
   type: string;
   session: string;
   secret?: string;
+  secretHash?: string;
   key?: string;
 }
 
@@ -30,12 +31,12 @@ export class DokDb implements DbApi {
   type: string;
   key?: string;
 
-  constructor({ rootUrl, user, type, session, secret, key }: Props) {
+  constructor({ rootUrl, user, type, session, secret, secretHash, key }: Props) {
     this.rootUrl = rootUrl;
     this.user = user;
     this.type = type;
     this.session = session;
-    this.secret = encodeSecret(secret);
+    this.secret = secretHash ?? encodeSecret(secret);
     this.key = key;
   }
 
