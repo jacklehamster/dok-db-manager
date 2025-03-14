@@ -16,7 +16,10 @@ export function addGetDataRoute(app: express.Express, { githubApi, owner, repo }
       } else if (typeof data[key] === "object") {
         data[key] = uncleanData(data[key]);
       } else if (typeof data[key] === "string") {
-        data[key] = decodeURIComponent(data[key]);
+        const value = decodeURIComponent(data[key]);
+        if (value !== data[key]) {
+          data[key] = decodeURIComponent(data[key]);
+        }
       }
 
     }
@@ -24,7 +27,7 @@ export function addGetDataRoute(app: express.Express, { githubApi, owner, repo }
   }
 
 
-  app.get("/data/*", async (req, res) => {
+  app.get("/data/*", async (req, res): Promise<any> => {
     const path = (req.params as string[])[0];
     const data = uncleanData(await githubApi.getData(path));
     const rawUrl = data.url;

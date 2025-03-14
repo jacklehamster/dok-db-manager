@@ -6,7 +6,7 @@ interface Props {
 }
 
 export function addListRoute(app: express.Express, { githubApi }: Props) {
-  app.get("/list", async (req, res) => {
+  app.get("/list", async (req, res): Promise<any> => {
     const subfolder = req.query.subfolder?.toString();
     const branch = req.query.branch?.toString();
     const recursive = req.query.recursive !== "false";

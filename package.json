@@ -44,18 +44,18 @@
     "dist"
   ],
   "devDependencies": {
-    "@dobuki/dev-dependencies": "^1.0.17",
-    "@types/express": "^4.17.21",
+    "@dobuki/dev-dependencies": "^1.0.20",
+    "@types/express": "^5.0.0",
     "@types/mime-types": "^2.1.4",
-    "@types/multer": "^1.4.11"
+    "@types/multer": "^1.4.12"
   },
   "dependencies": {
-    "@dobuki/code-lock": "latest",
-    "@dobuki/data-client": "latest",
+    "@dobuki/code-lock": "^1.0.13",
+    "@dobuki/data-client": "^1.0.17",
     "@the-brains/github-db": "^1.0.21",
-    "dok-auth": "latest",
-    "dotenv": "^16.4.5",
-    "express": "^4.21.1",
+    "dok-auth": "^1.0.30",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
     "mime-types": "^2.1.35",
     "multer": "^1.4.5-lts.1"
   }

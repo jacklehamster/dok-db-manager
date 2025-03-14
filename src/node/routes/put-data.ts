@@ -41,7 +41,7 @@ export function addPutDataRoute(app: express.Express, { githubApi, auth, owner, 
     return data;
   }
 
-  app.put("/data/*", async (req, res) => {
+  app.put("/data/*", async (req, res): Promise<any> => {
     const path = (req.params as string[])[0];
     const query = req.query as DataQuery;
     const body = req.body as BodyQuery;
@@ -96,7 +96,7 @@ export function addUploadRoute(app: express.Express, { githubApi, auth, owner, r
   const TYPES = ["image", "audio", "video", "bin"];
 
   TYPES.forEach((type) => {
-    app.post(`/upload/${type}`, upload.single(type), async (req, res) => {
+    app.post(`/upload/${type}`, upload.single(type) as unknown as express.RequestHandler, async (req, res): Promise<any> => {
       const file = req.file;
       if (!file) {
         return res.status(400).send('No file uploaded.');

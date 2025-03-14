@@ -1,11 +1,12 @@
 // const CACHE_URL_BASE = "https://cache-grab-worker.vincentlequang.workers.dev/";
-const CACHE_URL_BASE = "https://5kx5ne03pg.execute-api.us-east-1.amazonaws.com/cache-grab?url=";
+// const CACHE_URL_BASE = "https://5kx5ne03pg.execute-api.us-east-1.amazonaws.com/cache-grab?url=";
 
 export async function getCDNCacheUrl(url: string): Promise<string | null> {
-  const cacheUrl = `${CACHE_URL_BASE}${url}`;
-  const response = await fetch(cacheUrl);
-  const json = await response.json();
-  return json?.url ?? null;;
+  return url;
+  // const cacheUrl = `${CACHE_URL_BASE}${url}`;
+  // const response = await fetch(cacheUrl);
+  // const json = await response.json();
+  // return json?.url ?? null;;
 }
 
 const CACHED_HOMEPAGE: Record<string, string> = {
